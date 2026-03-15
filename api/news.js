@@ -7,19 +7,28 @@ export default async function handler(req, res) {
 
   const clientId = process.env.NAVER_CLIENT_ID;
   const clientSecret = process.env.NAVER_CLIENT_SECRET;
-  const claudeApiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!clientId || !clientSecret) {
     return res.status(500).json({ error: 'Naver API keys not configured' });
   }
 
+  // 노이즈 키워드 - 제목/본문에 포함시 제외
   const NOISE_KEYWORDS = [
+    // 자격증/시험
     '합격', '불합격', '시험일정', '시험공고', '접수기간', '원서접수',
     '자격증', '취득후기', '공부법', '공부방법', '강의추천', '인강',
     '노무사 시험', '노무사 합격', '공인노무사 합격',
-    '입사지원', '지원하기', '모집공고', '채용공고',
-    '이직후기', '취업후기', '면접후기', '연봉협상 후기',
+    // 채용공고
+    '입사지원', '지원하기', '모집공고', '채용공고', '채용 중',
+    // 개인 후기
+    '이직후기', '취업후기', '면접후기', '연봉협상 후기', '취업 성공',
+    // 인사발령
+    '취임', '임명', '청장', '장관 교체', '인사발령', '임원 선임',
+    '대표이사 취임', '신임 대표', '신임 원장', '신임 청장',
+    // 투자/주식
     '주식', '코스피', '코스닥', '펀드', '투자',
+    // 광고성
+    '할인', '이벤트', '프로모션', '신청하세요',
   ];
 
   function getKST(d) {
@@ -64,10 +73,10 @@ export default async function handler(req, res) {
     );
     const data = await response.json();
     if (!data.items || data.items.length === 0) {
-      return res.status(200).json({ items: [], period: periodLabel, mode });
+      return res.status(200).json({ items: [], filtered: [], period: periodLabel, mode });
     }
 
-    // 날짜 필터
+    // 1단계: 날짜 필터
     const dateFiltered = data.items.filter(item => {
       try {
         const d = new Date(item.pubDate);
@@ -83,19 +92,23 @@ export default async function handler(req, res) {
     }));
 
     if (dateFiltered.length === 0) {
-      return res.status(200).json({ items: [], period: periodLabel, mode });
+      return res.status(200).json({ items: [], filtered: [], period: periodLabel, mode });
     }
 
-    // 노이즈 필터
-    const noiseFiltered = dateFiltered.filter(item => {
+    // 2단계: 노이즈 필터 (통과 / 걸러짐 분리)
+    const passed = [];
+    const filtered = [];
+    for (const item of dateFiltered) {
       const text = item.title + ' ' + item.description;
-      return !NOISE_KEYWORDS.some(kw => text.includes(kw));
-    });
+      const isNoise = NOISE_KEYWORDS.some(kw => text.includes(kw));
+      if (isNoise) filtered.push({ ...item, filterReason: NOISE_KEYWORDS.find(kw => text.includes(kw)) });
+      else passed.push(item);
+    }
 
-    // 중복 제거
+    // 3단계: 중복 제거 (통과된 것만)
     const deduped = [];
     const seenTokens = [];
-    for (const item of noiseFiltered) {
+    for (const item of passed) {
       const tokens = item.title
         .replace(/[^\w가-힣\s]/g, '')
         .split(/\s+/)
@@ -108,62 +121,17 @@ export default async function handler(req, res) {
       if (!isDuplicate) {
         deduped.push(item);
         seenTokens.push(tokens);
+      } else {
+        filtered.push({ ...item, filterReason: '중복' });
       }
     }
 
-    if (!claudeApiKey || deduped.length <= 5) {
-      return res.status(200).json({ items: deduped.slice(0, 5), period: periodLabel, mode, aiUsed: false });
-    }
-
-    // AI TOP 5 선별
-    const articleList = deduped.slice(0, 40).map((a, i) =>
-      `[${i}] 제목: ${a.title}\n내용: ${a.description}`
-    ).join('\n\n');
-
-    const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': claudeApiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 150,
-        messages: [{
-          role: 'user',
-          content: `너는 대형 서비스/음료 프랜차이즈 기업(스타벅스)의 인사팀 담당자야. 동료들과 공유할 가치 있는 뉴스 TOP 5를 골라줘.
-
-선별 우선순위:
-1순위: 최저임금/임금/퇴직금/퇴직연금/4대보험/연차/근태 관련 법 개정 또는 입법예정
-2순위: 근로계약/해고/성과급/임금 관련 대법원·헌재 판결
-3순위: 고용노동부 주요 정책 발표, 서비스업/유통업 인사 이슈
-4순위: 채용트렌드/조직문화/성과관리/인재개발 사례
-5순위: 고용지표/노동시장/소비경기 동향
-
-제외: 개인후기, 광고성, 단순인사발령, 중복내용
-
-반드시 JSON 배열로만 응답. 예: [0,3,5,7,12]
-
-${articleList}`
-        }]
-      })
+    return res.status(200).json({
+      items: deduped.slice(0, 10),       // 메인 TOP 10
+      filtered: filtered.slice(0, 20),   // 검토함 (걸러진 기사)
+      period: periodLabel,
+      mode,
     });
-
-    const aiData = await aiRes.json();
-    const aiText = aiData.content?.[0]?.text || '';
-
-    let top5 = deduped.slice(0, 5);
-    try {
-      const match = aiText.match(/\[[\d,\s]+\]/);
-      if (match) {
-        const indices = JSON.parse(match[0]);
-        const picked = indices.slice(0, 5).map(i => deduped[i]).filter(Boolean);
-        if (picked.length > 0) top5 = picked;
-      }
-    } catch { /* fallback */ }
-
-    return res.status(200).json({ items: top5, period: periodLabel, mode, aiUsed: true });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
