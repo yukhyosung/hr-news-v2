@@ -13,8 +13,17 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Naver API keys not configured' });
   }
 
+  // 노이즈 키워드 - 이런 단어 포함된 기사 제거
+  const NOISE_KEYWORDS = [
+    '합격', '불합격', '시험일정', '시험공고', '접수기간', '원서접수',
+    '자격증', '취득후기', '공부법', '공부방법', '강의추천', '인강',
+    '노무사 시험', '노무사 합격', '공인노무사 합격',
+    '채용공고', '입사지원', '지원하기', '모집공고',
+    '연봉협상 후기', '이직후기', '취업후기', '면접후기',
+  ];
+
   try {
-    // 타겟 날짜 (KST 기준)
+    // 타겟 날짜 (KST)
     let targetDateStr;
     if (date) {
       targetDateStr = date;
@@ -40,13 +49,12 @@ export default async function handler(req, res) {
       return res.status(200).json({ items: [], date: targetDateStr });
     }
 
-    // 해당 날짜 기사만 필터링 (KST)
-    const filtered = data.items.filter(item => {
+    // 1단계: 날짜 필터링 (KST)
+    const dateFiltered = data.items.filter(item => {
       try {
         const d = new Date(item.pubDate);
         const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-        const itemDate = kst.toISOString().split('T')[0];
-        return itemDate === targetDateStr;
+        return kst.toISOString().split('T')[0] === targetDateStr;
       } catch { return false; }
     }).map(item => ({
       title: item.title.replace(/<[^>]+>/g, ''),
@@ -55,25 +63,47 @@ export default async function handler(req, res) {
       pubDate: item.pubDate,
     }));
 
-    if (filtered.length === 0) {
+    if (dateFiltered.length === 0) {
       return res.status(200).json({ items: [], date: targetDateStr });
     }
 
-    // 중복 제거 (제목 앞 20자 기준)
-    const seen = new Set();
-    const deduped = filtered.filter(item => {
-      const key = item.title.slice(0, 20);
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
+    // 2단계: 노이즈 필터링
+    const noiseFiltered = dateFiltered.filter(item => {
+      const text = item.title + item.description;
+      return !NOISE_KEYWORDS.some(kw => text.includes(kw));
     });
 
-    // 5개 이하면 바로 반환
-    if (!claudeApiKey || deduped.length <= 5) {
-      return res.status(200).json({ items: deduped.slice(0, 5), date: targetDateStr });
+    // 3단계: 강화된 중복 제거
+    const deduped = [];
+    const seenTokens = [];
+
+    for (const item of noiseFiltered) {
+      // 제목에서 핵심 토큰 추출 (2글자 이상 단어)
+      const tokens = item.title
+        .replace(/[^\w가-힣\s]/g, '')
+        .split(/\s+/)
+        .filter(t => t.length >= 2)
+        .slice(0, 6); // 앞 6개 단어만
+
+      // 기존 기사와 토큰 겹침 체크 (50% 이상 겹치면 중복)
+      const isDuplicate = seenTokens.some(seen => {
+        const overlap = tokens.filter(t => seen.includes(t)).length;
+        const similarity = overlap / Math.max(tokens.length, seen.length);
+        return similarity >= 0.5;
+      });
+
+      if (!isDuplicate) {
+        deduped.push(item);
+        seenTokens.push(tokens);
+      }
     }
 
-    // Claude AI로 영향력 top 5 선별
+    // 5개 이하거나 API Key 없으면 그냥 반환
+    if (!claudeApiKey || deduped.length <= 5) {
+      return res.status(200).json({ items: deduped.slice(0, 5), date: targetDateStr, aiUsed: false });
+    }
+
+    // 4단계: Claude AI로 영향력 TOP 5 선별
     const articleList = deduped.slice(0, 30).map((a, i) =>
       `[${i}] 제목: ${a.title}\n내용: ${a.description}`
     ).join('\n\n');
@@ -90,7 +120,11 @@ export default async function handler(req, res) {
         max_tokens: 100,
         messages: [{
           role: 'user',
-          content: `다음 뉴스 목록에서 HR 담당자 관점에서 가장 영향력 있는 기사 5개 인덱스를 JSON 배열로만 응답해. 예: [0,3,5,7,12]\n\n${articleList}`
+          content: `다음 뉴스 목록에서 HR 실무 담당자에게 가장 영향력 있는 기사 5개를 골라줘. 
+조건: 실제 인사/노무/경영 실무에 영향을 주는 기사만, 개인 후기나 광고성 기사 제외.
+반드시 JSON 배열로만 응답. 예: [0,3,5,7,12]
+
+${articleList}`
         }]
       })
     });
@@ -103,12 +137,12 @@ export default async function handler(req, res) {
       const match = aiText.match(/\[[\d,\s]+\]/);
       if (match) {
         const indices = JSON.parse(match[0]);
-        top5 = indices.slice(0, 5).map(i => deduped[i]).filter(Boolean);
-        if (top5.length === 0) top5 = deduped.slice(0, 5);
+        const picked = indices.slice(0, 5).map(i => deduped[i]).filter(Boolean);
+        if (picked.length > 0) top5 = picked;
       }
     } catch { /* fallback */ }
 
-    return res.status(200).json({ items: top5, date: targetDateStr });
+    return res.status(200).json({ items: top5, date: targetDateStr, aiUsed: true });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
