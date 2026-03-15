@@ -15,10 +15,12 @@
 :root {
   --bg: #0f0f14; --surface: #1a1a24; --surface2: #22222f;
   --border: #2a2a3a; --text: #f0f0f5; --text2: #8888a0; --text3: #44445a;
-  --accent: #4f7fff; --good: #4ecdc4; --bad: #ff6b6b;
+  --accent: #4f7fff; --good: #4ecdc4; --bad: #ff6b6b; --alert: #ffb347;
   --c1: #4f7fff; --c2: #ff6b6b; --c3: #ffb347; --c4: #4ecdc4; --c5: #a78bfa;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tag-labor: #ff6b6b; --tag-recruit: #ffb347; --tag-reward: #4ecdc4;
+  --tag-labor-rel: #a78bfa; --tag-hr: #4f7fff;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; overflow: hidden; }
@@ -28,39 +30,34 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--surface); border-bottom: 1px solid var(--border);
   padding: calc(var(--safe-top) + 14px) 20px 12px; flex-shrink: 0;
 }
-.header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.header-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .header-title { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
 .version-tag { font-size: 9px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; font-weight: 600; }
-.header-badge {
-  margin-left: auto; font-size: 10px; color: var(--accent);
-  background: rgba(79,127,255,0.12); border: 1px solid rgba(79,127,255,0.25);
-  padding: 3px 10px; border-radius: 10px; font-weight: 600;
-}
+.header-badge { margin-left: auto; font-size: 10px; color: var(--accent); background: rgba(79,127,255,0.12); border: 1px solid rgba(79,127,255,0.25); padding: 3px 10px; border-radius: 10px; font-weight: 600; }
 .period-row { display: flex; gap: 6px; align-items: center; }
-.period-btn {
-  padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border);
-  background: transparent; color: var(--text2); font-size: 11px; font-weight: 600;
-  cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; white-space: nowrap;
-}
+.period-btn { padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--text2); font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; white-space: nowrap; }
 .period-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.date-input {
-  padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border);
-  background: var(--surface2); color: var(--text); font-size: 11px;
-  font-family: 'Noto Sans KR', sans-serif; cursor: pointer; outline: none; flex: 1;
-}
-.date-input:focus { border-color: var(--accent); }
+.date-input { padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-size: 11px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; outline: none; flex: 1; }
 
-.cat-scroll {
-  display: flex; gap: 8px; padding: 10px 16px;
-  overflow-x: auto; background: var(--surface);
-  border-bottom: 1px solid var(--border); scrollbar-width: none; flex-shrink: 0;
-}
+/* Alert Banner */
+.alert-banner { background: linear-gradient(135deg, rgba(255,179,71,0.15), rgba(255,107,107,0.1)); border-bottom: 1px solid rgba(255,179,71,0.3); padding: 10px 16px; flex-shrink: 0; animation: slideDown 0.3s ease; }
+@keyframes slideDown { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+.alert-title { font-size: 11px; font-weight: 700; color: var(--alert); margin-bottom: 6px; }
+.alert-item { font-size: 12px; color: var(--text); padding: 5px 10px; background: rgba(255,179,71,0.1); border-radius: 8px; margin-bottom: 4px; border-left: 3px solid var(--alert); cursor: pointer; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Keyword TOP */
+.keyword-section { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
+.keyword-title { font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
+.keyword-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.keyword-chip { display: flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; }
+.keyword-rank { font-size: 10px; font-weight: 900; color: var(--accent); }
+.keyword-text { color: var(--text); font-weight: 600; }
+.keyword-count { font-size: 10px; color: var(--text3); }
+
+/* Category tabs */
+.cat-scroll { display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--border); scrollbar-width: none; flex-shrink: 0; }
 .cat-scroll::-webkit-scrollbar { display: none; }
-.cat-btn {
-  padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border);
-  background: transparent; color: var(--text2); font-size: 12px; font-weight: 600;
-  cursor: pointer; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
-}
+.cat-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
 .cat-btn.active { color: #fff; border-color: transparent; }
 
 .content { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
@@ -68,24 +65,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 0; margin-bottom: 2px; }
 .period-label { font-size: 11px; color: var(--text3); }
-.refresh-btn {
-  background: none; border: none; color: var(--accent);
-  font-size: 12px; font-weight: 600; cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif; padding: 4px 8px;
-}
+.refresh-btn { background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; padding: 4px 8px; }
 
 /* News Card */
-.news-card {
-  background: var(--surface); border-radius: 16px;
-  padding: 16px; border: 1px solid var(--border);
-}
-.card-num { font-size: 10px; font-weight: 900; color: var(--accent); margin-bottom: 6px; letter-spacing: 1px; }
+.news-card { background: var(--surface); border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
+.news-card.priority { border-color: rgba(79,127,255,0.3); }
+.card-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.card-num { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 1px; }
+.tag-chip { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+.tag-노동법 { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+.tag-채용 { background: rgba(255,179,71,0.2); color: #ffb347; }
+.tag-보상 { background: rgba(78,205,196,0.2); color: #4ecdc4; }
+.tag-노사 { background: rgba(167,139,250,0.2); color: #a78bfa; }
+.tag-HR트렌드 { background: rgba(79,127,255,0.2); color: #4f7fff; }
+.priority-tag { font-size: 9px; font-weight: 700; color: var(--alert); background: rgba(255,179,71,0.15); border: 1px solid rgba(255,179,71,0.3); padding: 1px 7px; border-radius: 6px; }
 .card-top { display: flex; gap: 10px; align-items: flex-start; }
-.news-title {
-  flex: 1; font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--text);
-  text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
+.news-title { flex: 1; font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--text); text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .news-title:hover { color: var(--accent); }
 .scrap-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; flex-shrink: 0; opacity: 0.5; transition: opacity 0.2s; }
 .scrap-btn:active { opacity: 1; }
@@ -93,75 +88,37 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .news-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-top: 10px; }
 .expand-btn { background: none; border: none; color: var(--text3); font-size: 11px; cursor: pointer; margin-top: 8px; font-family: 'Noto Sans KR', sans-serif; padding: 0; }
 
-/* Review Card - 검토함 */
-.review-card {
-  background: var(--surface); border-radius: 16px;
-  padding: 14px; border: 1px solid var(--border);
-}
-.filter-reason {
-  display: inline-block; font-size: 10px; color: var(--text3);
-  background: var(--surface2); border: 1px solid var(--border);
-  padding: 2px 8px; border-radius: 8px; margin-bottom: 8px;
-}
+/* Review Card */
+.review-card { background: var(--surface); border-radius: 16px; padding: 14px; border: 1px solid var(--border); }
+.filter-reason { display: inline-block; font-size: 10px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 8px; margin-bottom: 8px; }
 .rating-row { display: flex; gap: 8px; margin-top: 10px; }
-.rate-btn {
-  flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border);
-  background: transparent; font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
-}
+.rate-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
 .rate-btn.good { color: var(--good); border-color: var(--good); }
 .rate-btn.good.selected { background: var(--good); color: #fff; }
 .rate-btn.bad { color: var(--bad); border-color: var(--bad); }
 .rate-btn.bad.selected { background: var(--bad); color: #fff; }
 
-/* Empty / Loading */
 .empty-box { display: flex; flex-direction: column; align-items: center; padding: 60px 0; color: var(--text3); gap: 10px; font-size: 14px; }
 .loading-box { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px 0; color: var(--text3); font-size: 13px; }
 .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Bottom Nav */
-.bottom-nav {
-  display: flex; background: var(--surface); border-top: 1px solid var(--border);
-  padding-bottom: calc(8px + var(--safe-bottom)); flex-shrink: 0;
-}
-.nav-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  padding: 10px 0 4px; border: none; background: transparent;
-  color: var(--text3); cursor: pointer; font-size: 10px;
-  font-family: 'Noto Sans KR', sans-serif; gap: 3px; transition: color 0.2s;
-}
+.bottom-nav { display: flex; background: var(--surface); border-top: 1px solid var(--border); padding-bottom: calc(8px + var(--safe-bottom)); flex-shrink: 0; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 4px; border: none; background: transparent; color: var(--text3); cursor: pointer; font-size: 10px; font-family: 'Noto Sans KR', sans-serif; gap: 3px; transition: color 0.2s; }
 .nav-btn.active { color: var(--accent); }
 .nav-icon { font-size: 22px; }
-
 .cat-chip { font-size: 10px; color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 600; display: inline-block; }
 
-.toast {
-  position: fixed; bottom: calc(80px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
-  background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
-  color: #fff; padding: 10px 22px; border-radius: 20px; font-size: 13px;
-  white-space: nowrap; z-index: 999; border: 1px solid rgba(255,255,255,0.15);
-  animation: fadeUp 0.2s ease;
-}
+.toast { position: fixed; bottom: calc(80px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); color: #fff; padding: 10px 22px; border-radius: 20px; font-size: 13px; white-space: nowrap; z-index: 999; border: 1px solid rgba(255,255,255,0.15); animation: fadeUp 0.2s ease; }
 @keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
 
-/* Settings */
 .settings-content { padding: 24px 20px; overflow-y: auto; height: 100%; }
 .settings-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
 .settings-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
 .info-box { background: var(--surface2); border-radius: 14px; padding: 16px 18px; font-size: 12px; color: var(--text2); line-height: 2.2; border: 1px solid var(--border); margin-bottom: 14px; }
 .info-title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 13px; }
-.export-btn {
-  width: 100%; padding: 15px; border-radius: 14px; border: none;
-  background: linear-gradient(135deg, var(--c4), var(--c1));
-  color: #fff; font-size: 15px; font-weight: 700;
-  cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 14px;
-}
-.danger-btn {
-  width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--bad);
-  background: transparent; color: var(--bad); font-size: 13px; font-weight: 600;
-  cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 14px;
-}
+.export-btn { width: 100%; padding: 15px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--c4), var(--c1)); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 14px; }
+.danger-btn { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--bad); background: transparent; color: var(--bad); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 14px; }
 </style>
 </head>
 <body>
@@ -170,11 +127,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="header-top">
       <span style="font-size:22px">📰</span>
       <span class="header-title">HR 뉴스</span>
-      <span class="version-tag">v5.0</span>
+      <span class="version-tag">v7.0</span>
       <span class="header-badge">TOP 5</span>
     </div>
     <div class="period-row" id="period-row"></div>
   </div>
+  <div id="alert-area"></div>
+  <div id="keyword-area"></div>
   <div id="main-content" style="flex:1;overflow:hidden;display:flex;flex-direction:column;"></div>
   <div class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('news')" id="nav-news">
@@ -193,14 +152,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 </div>
 
 <script>
-const VERSION = 'v5.0';
-const CATEGORIES = [
-  { id:'hr',      label:'HR·인사',      keyword:'인사관리 HR',   color:'#4f7fff' },
-  { id:'labor',   label:'노동법·노무',   keyword:'노동법 노무',   color:'#ff6b6b' },
-  { id:'recruit', label:'채용·취업',     keyword:'채용 취업시장', color:'#ffb347' },
-  { id:'economy', label:'경제·경영',     keyword:'경제 경영',     color:'#4ecdc4' },
-  { id:'welfare', label:'복지·조직문화', keyword:'복지 조직문화', color:'#a78bfa' },
-];
+const VERSION = 'v7.0';
 
 function getKSTDate(offset = 0) {
   const now = new Date();
@@ -209,24 +161,22 @@ function getKSTDate(offset = 0) {
 }
 
 let currentTab = 'news';
-let activeCategory = CATEGORIES[0];
 let periodMode = 'day';
 let selectedDate = getKSTDate(0);
-let newsCache = {};      // 메인 뉴스 캐시
-let reviewCache = {};    // 검토함 캐시
-let summaryCache = {};
-let scraps = JSON.parse(localStorage.getItem('hr_scraps_v4') || '[]');
-let ratings = JSON.parse(localStorage.getItem('hr_ratings') || '[]'); // 평가 데이터
+let newsCache = {};
+let reviewCache = {};
+let alertCache = {};
+let keywordCache = {};
+let scraps = JSON.parse(localStorage.getItem('hr_scraps_v7') || '[]');
+let ratings = JSON.parse(localStorage.getItem('hr_ratings_v7') || '[]');
 let expanded = null;
 let scrapFilter = 'all';
 let toastTimer = null;
-let deferredPrompt = null;
 
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
-function saveScraps() { localStorage.setItem('hr_scraps_v4', JSON.stringify(scraps)); }
-function saveRatings() { localStorage.setItem('hr_ratings', JSON.stringify(ratings)); }
+function saveScraps() { localStorage.setItem('hr_scraps_v7', JSON.stringify(scraps)); }
+function saveRatings() { localStorage.setItem('hr_ratings_v7', JSON.stringify(ratings)); }
 
 function showToast(msg) {
   document.querySelectorAll('.toast').forEach(e => e.remove());
@@ -240,8 +190,8 @@ function showToast(msg) {
 function updateLabels() {
   const sl = document.getElementById('nav-scrap-label');
   if (sl) sl.textContent = scraps.length > 0 ? `스크랩(${scraps.length})` : '스크랩';
-  const rl = document.getElementById('nav-review-label');
   const unrated = ratings.filter(r => !r.rating).length;
+  const rl = document.getElementById('nav-review-label');
   if (rl) rl.textContent = unrated > 0 ? `검토함(${unrated})` : '검토함';
 }
 
@@ -256,6 +206,33 @@ function renderPeriodRow() {
   `;
 }
 
+function renderAlerts(alerts) {
+  const area = document.getElementById('alert-area');
+  if (!alerts || alerts.length === 0) { area.innerHTML = ''; return; }
+  area.innerHTML = `<div class="alert-banner">
+    <div class="alert-title">🔔 중요 기사 감지!</div>
+    ${alerts.map(a => `<div class="alert-item" onclick="window.open('${a.link}','_blank')">${a.title}</div>`).join('')}
+  </div>`;
+}
+
+function renderKeywords(keywords) {
+  const area = document.getElementById('keyword-area');
+  if (!keywords || keywords.length === 0) { area.innerHTML = ''; return; }
+  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' : selectedDate === getKSTDate(0) ? '오늘' : '선택일';
+  area.innerHTML = `<div class="keyword-section">
+    <div class="keyword-title">📊 ${periodText} HR 키워드 TOP</div>
+    <div class="keyword-list">
+      ${keywords.map((k, i) => `
+        <div class="keyword-chip">
+          <span class="keyword-rank">${i+1}</span>
+          <span class="keyword-text">${k.keyword}</span>
+          <span class="keyword-count">${k.count}</span>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
 function setPeriod(mode, dateVal) {
   periodMode = mode;
   if (mode === 'day') {
@@ -267,19 +244,27 @@ function setPeriod(mode, dateVal) {
   renderPeriodRow();
   if (currentTab === 'news' || currentTab === 'review') {
     const key = getCacheKey();
-    if (!newsCache[key]) fetchNews(activeCategory);
-    else currentTab === 'news' ? renderNews() : renderReview();
+    if (!newsCache[key]) fetchNews();
+    else {
+      renderAlerts(alertCache[key]);
+      renderKeywords(keywordCache[key]);
+      currentTab === 'news' ? renderNews() : renderReview();
+    }
   }
 }
 
 function getCacheKey() {
-  return `${activeCategory.id}_${periodMode}_${selectedDate}`;
+  return `${periodMode}_${selectedDate}`;
 }
 
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('nav-' + tab)?.classList.add('active');
+  if (tab !== 'news' && tab !== 'review') {
+    document.getElementById('alert-area').innerHTML = '';
+    document.getElementById('keyword-area').innerHTML = '';
+  }
   render();
 }
 
@@ -291,67 +276,56 @@ function formatDate(str) {
   } catch { return str; }
 }
 
-async function fetchNews(cat) {
+function getTagClass(tag) {
+  const map = { '노동법': 'tag-노동법', '채용': 'tag-채용', '보상': 'tag-보상', '노사': 'tag-노사', 'HR트렌드': 'tag-HR트렌드' };
+  return map[tag] || '';
+}
+
+const PRIORITY_KWS = ['대법원','헌법재판소','판결','입법예고','시행령','개정안','임금체불','퇴직금','통상임금','최저임금','4대보험','중대재해','특별감독','부당해고','노란봉투법','정년연장'];
+
+async function fetchNews() {
   const wrap = document.getElementById('main-content');
-  wrap.innerHTML = renderCatTabsHTML() +
-    `<div class="content"><div class="loading-box"><div class="spinner"></div>뉴스 불러오는 중...</div></div>`;
+  document.getElementById('alert-area').innerHTML = '';
+  document.getElementById('keyword-area').innerHTML = '';
+  wrap.innerHTML = `<div class="content"><div class="loading-box"><div class="spinner"></div>뉴스 수집 중... (5개 키워드 그룹)</div></div>`;
 
   try {
-    const params = new URLSearchParams({ keyword: cat.keyword, mode: periodMode });
+    const params = new URLSearchParams({ mode: periodMode });
     if (periodMode === 'day') params.append('date', selectedDate);
     const res = await fetch(`/api/news?${params}`);
     const data = await res.json();
     const key = getCacheKey();
     newsCache[key] = data.items || [];
     reviewCache[key] = data.filtered || [];
+    alertCache[key] = data.alerts || [];
+    keywordCache[key] = data.topKeywords || [];
 
-    // 걸러진 기사 ratings에 추가 (새로운 것만)
+    // ratings 추가
     const existingLinks = new Set(ratings.map(r => r.link));
-    for (const item of reviewCache[key]) {
-      if (!existingLinks.has(item.link)) {
-        ratings.push({
-          id: item.link,
-          link: item.link,
-          title: item.title,
-          description: item.description,
-          pubDate: item.pubDate,
-          filterReason: item.filterReason,
-          category: cat.id,
-          categoryLabel: cat.label,
-          type: 'filtered', // 걸러진 기사
-          rating: null,
-          ratedAt: null,
-          addedAt: new Date().toISOString(),
-        });
-      }
-    }
-    // 추천 기사도 ratings에 추가 (새로운 것만)
     for (const item of newsCache[key]) {
       if (!existingLinks.has(item.link)) {
-        ratings.push({
-          id: item.link,
-          link: item.link,
-          title: item.title,
-          description: item.description,
-          pubDate: item.pubDate,
-          filterReason: null,
-          category: cat.id,
-          categoryLabel: cat.label,
-          type: 'recommended', // 추천 기사
-          rating: null,
-          ratedAt: null,
-          addedAt: new Date().toISOString(),
-        });
+        ratings.push({ id: item.link, link: item.link, title: item.title,
+          description: item.description, pubDate: item.pubDate, tag: item.tag,
+          category: 'all', type: 'recommended', rating: null, ratedAt: null,
+          addedAt: new Date().toISOString() });
       }
     }
-    saveRatings();
-    updateLabels();
-
+    for (const item of reviewCache[key]) {
+      if (!existingLinks.has(item.link)) {
+        ratings.push({ id: item.link, link: item.link, title: item.title,
+          description: item.description, pubDate: item.pubDate,
+          filterReason: item.filterReason, category: 'all',
+          type: 'filtered', rating: null, ratedAt: null,
+          addedAt: new Date().toISOString() });
+      }
+    }
+    saveRatings(); updateLabels();
+    renderAlerts(alertCache[key]);
+    renderKeywords(keywordCache[key]);
     if (newsCache[key].length === 0) showToast('📭 해당 기간 기사가 없어요');
   } catch {
     const key = getCacheKey();
-    newsCache[key] = [];
-    reviewCache[key] = [];
+    newsCache[key] = []; reviewCache[key] = []; alertCache[key] = []; keywordCache[key] = [];
     showToast('❌ 뉴스를 불러오지 못했어요');
   }
   currentTab === 'review' ? renderReview() : renderNews();
@@ -362,11 +336,7 @@ function scrap(itemId) {
   const item = (newsCache[key] || []).find(n => n.link === itemId);
   if (!item) return;
   if (scraps.find(s => s.id === itemId)) { showToast('이미 스크랩된 기사예요'); return; }
-  scraps.unshift({
-    id: itemId, ...item,
-    category: activeCategory.id, categoryLabel: activeCategory.label, categoryColor: activeCategory.color,
-    scrapDate: new Date().toISOString(),
-  });
+  scraps.unshift({ id: itemId, ...item, scrapDate: new Date().toISOString() });
   saveScraps(); updateLabels();
   showToast('✅ 스크랩 완료!');
 }
@@ -388,22 +358,6 @@ function rateArticle(itemId, rating) {
   renderReview();
 }
 
-function renderCatTabsHTML() {
-  return `<div class="cat-scroll">
-    ${CATEGORIES.map(c => `<button class="cat-btn${c.id===activeCategory.id?' active':''}"
-      style="${c.id===activeCategory.id?`background:${c.color};`:''}"
-      onclick="selectCat('${c.id}')">${c.label}</button>`).join('')}
-  </div>`;
-}
-
-function selectCat(id) {
-  activeCategory = CATEGORIES.find(c => c.id === id);
-  expanded = null;
-  const key = getCacheKey();
-  if (!newsCache[key]) fetchNews(activeCategory);
-  else currentTab === 'review' ? renderReview() : renderNews();
-}
-
 function renderNews() {
   const key = getCacheKey();
   const items = newsCache[key] || [];
@@ -413,7 +367,7 @@ function renderNews() {
     selectedDate === getKSTDate(0) ? '오늘' : selectedDate === getKSTDate(1) ? '어제' : selectedDate.slice(5).replace('-','/');
 
   const toolbar = `<div class="toolbar">
-    <span class="period-label">${periodText} · ${activeCategory.label} · ${items.length}건</span>
+    <span class="period-label">${periodText} · ${items.length}건</span>
     <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
   </div>`;
 
@@ -424,8 +378,14 @@ function renderNews() {
     cards = items.map((item, i) => {
       const isExp = expanded === item.link;
       const safeId = encodeURIComponent(item.link);
-      return `<div class="news-card">
-        <div class="card-num">TOP ${i+1}</div>
+      const priority = PRIORITY_KWS.some(kw => item.title.includes(kw));
+      const tagClass = getTagClass(item.tag);
+      return `<div class="news-card${priority?' priority':''}">
+        <div class="card-header">
+          <span class="card-num">TOP ${i+1}</span>
+          ${item.tag ? `<span class="tag-chip ${tagClass}">${item.tag}</span>` : ''}
+          ${priority ? `<span class="priority-tag">🔥 중요</span>` : ''}
+        </div>
         <div class="card-top">
           <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
           <button class="scrap-btn" onclick="scrap(decodeURIComponent('${safeId}'))">📌</button>
@@ -437,18 +397,17 @@ function renderNews() {
     }).join('');
   }
 
-  wrap.innerHTML = renderCatTabsHTML() + toolbar + `<div class="content">${cards}</div>`;
+  wrap.innerHTML = toolbar + `<div class="content">${cards}</div>`;
 }
 
 function renderReview() {
   const wrap = document.getElementById('main-content');
-  const catRatings = ratings.filter(r => r.category === activeCategory.id);
-  const recommended = catRatings.filter(r => r.type === 'recommended');
-  const filtered = catRatings.filter(r => r.type === 'filtered');
-  const unrated = catRatings.filter(r => !r.rating).length;
+  const recommended = ratings.filter(r => r.type === 'recommended');
+  const filtered = ratings.filter(r => r.type === 'filtered');
+  const unrated = ratings.filter(r => !r.rating).length;
 
   const toolbar = `<div class="toolbar">
-    <span class="period-label">평가함 · ${activeCategory.label} · 미평가 ${unrated}건</span>
+    <span class="period-label">평가함 · 미평가 ${unrated}건</span>
     <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
   </div>`;
 
@@ -456,17 +415,19 @@ function renderReview() {
     if (items.length === 0) return '';
     const cards = items.map(item => {
       const safeId = encodeURIComponent(item.id);
+      const tagClass = getTagClass(item.tag);
       return `<div class="review-card">
-        <span class="filter-reason">${emoji} ${label}${item.filterReason ? ' · ' + item.filterReason : ''}</span>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+          ${item.tag ? `<span class="tag-chip ${tagClass}">${item.tag}</span>` : ''}
+          <span class="filter-reason">${emoji} ${label}${item.filterReason ? ' · ' + item.filterReason : ''}</span>
+        </div>
         <div class="card-top">
           <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
         </div>
         <div class="news-date">${formatDate(item.pubDate)}</div>
         <div class="rating-row">
-          <button class="rate-btn good ${item.rating==='good'?'selected':''}"
-            onclick="rateArticle(decodeURIComponent('${safeId}'),'good')">👍 유용</button>
-          <button class="rate-btn bad ${item.rating==='bad'?'selected':''}"
-            onclick="rateArticle(decodeURIComponent('${safeId}'),'bad')">👎 불필요</button>
+          <button class="rate-btn good ${item.rating==='good'?'selected':''}" onclick="rateArticle(decodeURIComponent('${safeId}'),'good')">👍 유용</button>
+          <button class="rate-btn bad ${item.rating==='bad'?'selected':''}" onclick="rateArticle(decodeURIComponent('${safeId}'),'bad')">👎 불필요</button>
         </div>
       </div>`;
     }).join('');
@@ -475,10 +436,10 @@ function renderReview() {
 
   const allEmpty = recommended.length === 0 && filtered.length === 0;
   const content = allEmpty
-    ? `<div class="empty-box"><div style="font-size:44px">✅</div><div>평가할 기사가 없어요<br><span style="font-size:12px">뉴스 탭에서 새로고침해보세요</span></div></div>`
+    ? `<div class="empty-box"><div style="font-size:44px">✅</div><div>평가할 기사가 없어요</div></div>`
     : renderCards(recommended, '추천 기사', '🗞️') + renderCards(filtered, '걸러진 기사', '🔍');
 
-  wrap.innerHTML = renderCatTabsHTML() + toolbar + `<div class="content">${content}</div>`;
+  wrap.innerHTML = toolbar + `<div class="content">${content}</div>`;
 }
 
 function toggleExpand(id) {
@@ -487,26 +448,22 @@ function toggleExpand(id) {
 }
 
 function refreshNews() {
-  delete newsCache[getCacheKey()];
-  delete reviewCache[getCacheKey()];
+  const key = getCacheKey();
+  delete newsCache[key]; delete reviewCache[key]; delete alertCache[key]; delete keywordCache[key];
   expanded = null;
-  fetchNews(activeCategory);
+  fetchNews();
 }
 
 function renderScraps() {
-  const filtered = scrapFilter === 'all' ? scraps : scraps.filter(s => s.category === scrapFilter);
+  const filtered = scrapFilter === 'all' ? scraps : scraps.filter(s => s.tag === scrapFilter);
   const wrap = document.getElementById('main-content');
 
+  const tags = [...new Set(scraps.map(s => s.tag).filter(Boolean))];
   const filterTabs = `<div class="cat-scroll">
-    <button class="cat-btn${scrapFilter==='all'?' active':''}"
-      style="${scrapFilter==='all'?'background:#333;color:#fff;':''}"
-      onclick="setScrapFilter('all')">전체(${scraps.length})</button>
-    ${CATEGORIES.map(c => {
-      const cnt = scraps.filter(s => s.category === c.id).length;
-      if (!cnt) return '';
-      return `<button class="cat-btn${scrapFilter===c.id?' active':''}"
-        style="${scrapFilter===c.id?`background:${c.color};color:#fff;`:''}"
-        onclick="setScrapFilter('${c.id}')">${c.label}(${cnt})</button>`;
+    <button class="cat-btn${scrapFilter==='all'?' active':''}" style="${scrapFilter==='all'?'background:#333;color:#fff;':''}" onclick="setScrapFilter('all')">전체(${scraps.length})</button>
+    ${tags.map(tag => {
+      const cnt = scraps.filter(s => s.tag === tag).length;
+      return `<button class="cat-btn${scrapFilter===tag?' active':''}" onclick="setScrapFilter('${tag}')">${tag}(${cnt})</button>`;
     }).join('')}
   </div>`;
 
@@ -514,51 +471,38 @@ function renderScraps() {
   if (filtered.length === 0) {
     cards = `<div class="empty-box"><div style="font-size:44px">📂</div><div>스크랩한 기사가 없어요</div></div>`;
   } else {
-    cards = filtered.map(item => `
-      <div class="news-card">
+    cards = filtered.map(item => {
+      const tagClass = getTagClass(item.tag);
+      return `<div class="news-card">
         <div class="card-top">
           <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
           <button class="scrap-btn" style="color:#ff6b6b" onclick="deleteScrap(decodeURIComponent('${encodeURIComponent(item.id)}'))">🗑️</button>
         </div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
-          <span class="cat-chip" style="background:${item.categoryColor}">${item.categoryLabel}</span>
+          ${item.tag ? `<span class="tag-chip ${tagClass}">${item.tag}</span>` : ''}
           <span class="news-date">${formatDate(item.scrapDate)}</span>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
-
   wrap.innerHTML = filterTabs + `<div class="content">${cards}</div>`;
 }
 
 function setScrapFilter(f) { scrapFilter = f; renderScraps(); }
 
 function exportRatings() {
-  const data = {
-    exportedAt: new Date().toISOString(),
-    version: VERSION,
-    totalRatings: ratings.length,
-    ratedCount: ratings.filter(r => r.rating).length,
-    goodCount: ratings.filter(r => r.rating === 'good').length,
-    badCount: ratings.filter(r => r.rating === 'bad').length,
-    ratings: ratings,
-  };
+  const data = { exportedAt: new Date().toISOString(), version: VERSION, totalRatings: ratings.length, ratedCount: ratings.filter(r => r.rating).length, goodCount: ratings.filter(r => r.rating === 'good').length, badCount: ratings.filter(r => r.rating === 'bad').length, ratings };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `hr-news-ratings-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = `hr-ratings-${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); URL.revokeObjectURL(url);
   showToast('📥 평가 데이터 다운로드 완료!');
 }
 
 function clearRatings() {
   if (confirm('평가 데이터를 모두 삭제할까요?')) {
-    ratings = [];
-    saveRatings(); updateLabels();
-    showToast('🗑️ 평가 데이터 삭제됐어요');
-    renderSettings();
+    ratings = []; saveRatings(); updateLabels(); showToast('🗑️ 삭제됐어요'); renderSettings();
   }
 }
 
@@ -566,59 +510,42 @@ function renderSettings() {
   const wrap = document.getElementById('main-content');
   const goodCount = ratings.filter(r => r.rating === 'good').length;
   const badCount = ratings.filter(r => r.rating === 'bad').length;
-  const unratedCount = ratings.filter(r => !r.rating).length;
-
   wrap.innerHTML = `<div class="content"><div class="settings-content">
     <div class="settings-title">⚙️ 설정</div>
     <p class="settings-desc">HR 뉴스 ${VERSION}<br>스타벅스 인사팀 맞춤 뉴스 앱</p>
-
     <div class="info-box">
       <div class="info-title">📊 평가 데이터 현황</div>
-      <div>전체 평가: ${ratings.length}건</div>
-      <div>👍 유용: ${goodCount}건 · 👎 불필요: ${badCount}건</div>
-      <div>미평가: ${unratedCount}건</div>
-      <div style="margin-top:6px;color:var(--text3);font-size:11px;">2주 후 데이터 내보내서 AI 학습에 활용하세요</div>
+      <div>전체: ${ratings.length}건 · 👍 ${goodCount} · 👎 ${badCount} · 미평가 ${ratings.filter(r=>!r.rating).length}</div>
+      <div style="margin-top:4px;color:var(--text3);font-size:11px;">데이터 내보내기 → Claude에게 전달 → v8 업데이트</div>
     </div>
-
     <button class="export-btn" onclick="exportRatings()">📥 평가 데이터 내보내기</button>
-
     <div class="info-box">
-      <div class="info-title">🤖 AI 선별 기준</div>
-      <div>1순위: 임금/퇴직금/4대보험/연차 법 개정</div>
-      <div>2순위: 대법원·헌재 노동 판결</div>
-      <div>3순위: 고용노동부 정책, 서비스업 이슈</div>
-      <div>4순위: 채용/조직문화/성과관리 트렌드</div>
-      <div>5순위: 고용지표/경기 동향</div>
+      <div class="info-title">🏷️ 자동 태그 분류</div>
+      <div>노동법 · 채용 · 보상 · 노사 · HR트렌드</div>
+      <div style="margin-top:4px;color:var(--text3);font-size:11px;">키워드 기반 자동 분류</div>
     </div>
-
     <div class="info-box">
-      <div class="info-title">📱 홈화면 추가 (iOS Safari)</div>
-      <div>1. Safari에서 접속</div>
-      <div>2. 하단 공유 버튼 탭</div>
-      <div>3. "홈 화면에 추가" 선택</div>
+      <div class="info-title">🔍 검색 키워드 그룹 (5개)</div>
+      <div>노동법·정책 / 채용·취업 / 보상·임금</div>
+      <div>노사관계 / HR트렌드</div>
     </div>
-
+    <div class="info-box">
+      <div class="info-title">📱 홈화면 추가 (iOS)</div>
+      <div>Safari → 공유 버튼 → 홈 화면에 추가</div>
+    </div>
     <button class="danger-btn" onclick="clearRatings()">🗑️ 평가 데이터 초기화</button>
   </div></div>`;
 }
 
-function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => { deferredPrompt = null; renderSettings(); });
-  }
-}
-
 function render() {
-  renderPeriodRow();
-  updateLabels();
+  renderPeriodRow(); updateLabels();
   if (currentTab === 'news') {
     const key = getCacheKey();
-    if (!newsCache[key]) fetchNews(activeCategory);
-    else renderNews();
+    if (!newsCache[key]) fetchNews();
+    else { renderAlerts(alertCache[key]); renderKeywords(keywordCache[key]); renderNews(); }
   } else if (currentTab === 'review') {
     const key = getCacheKey();
-    if (!newsCache[key]) fetchNews(activeCategory);
+    if (!newsCache[key]) fetchNews();
     else renderReview();
   } else if (currentTab === 'scraps') {
     renderScraps();
