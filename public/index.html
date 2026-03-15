@@ -298,8 +298,7 @@ async function fetchNews() {
   wrap.innerHTML = `<div class="content"><div class="loading-box"><div class="spinner"></div>이슈 분석 중...</div></div>`;
 
   try {
-    const params = new URLSearchParams({ mode: periodMode });
-    if (periodMode === 'day') params.append('date', selectedDate);
+    const params = new URLSearchParams({ mode: periodMode, date: selectedDate });
     const res = await fetch(`/api/news?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
