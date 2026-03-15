@@ -170,8 +170,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="header-top">
       <span style="font-size:22px">📰</span>
       <span class="header-title">HR 뉴스</span>
-      <span class="version-tag">v4.0</span>
-      <span class="header-badge">TOP 10</span>
+      <span class="version-tag">v5.0</span>
+      <span class="header-badge">TOP 5</span>
     </div>
     <div class="period-row" id="period-row"></div>
   </div>
@@ -193,7 +193,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 </div>
 
 <script>
-const VERSION = 'v4.0';
+const VERSION = 'v5.0';
 const CATEGORIES = [
   { id:'hr',      label:'HR·인사',      keyword:'인사관리 HR',   color:'#4f7fff' },
   { id:'labor',   label:'노동법·노무',   keyword:'노동법 노무',   color:'#ff6b6b' },
@@ -318,7 +318,27 @@ async function fetchNews(cat) {
           filterReason: item.filterReason,
           category: cat.id,
           categoryLabel: cat.label,
-          rating: null, // null = 미평가
+          type: 'filtered', // 걸러진 기사
+          rating: null,
+          ratedAt: null,
+          addedAt: new Date().toISOString(),
+        });
+      }
+    }
+    // 추천 기사도 ratings에 추가 (새로운 것만)
+    for (const item of newsCache[key]) {
+      if (!existingLinks.has(item.link)) {
+        ratings.push({
+          id: item.link,
+          link: item.link,
+          title: item.title,
+          description: item.description,
+          pubDate: item.pubDate,
+          filterReason: null,
+          category: cat.id,
+          categoryLabel: cat.label,
+          type: 'recommended', // 추천 기사
+          rating: null,
           ratedAt: null,
           addedAt: new Date().toISOString(),
         });
@@ -422,25 +442,22 @@ function renderNews() {
 
 function renderReview() {
   const wrap = document.getElementById('main-content');
-  // 현재 카테고리의 미평가 항목 우선, 평가된 것도 보여줌
   const catRatings = ratings.filter(r => r.category === activeCategory.id);
-  const unrated = catRatings.filter(r => !r.rating);
-  const rated = catRatings.filter(r => r.rating);
+  const recommended = catRatings.filter(r => r.type === 'recommended');
+  const filtered = catRatings.filter(r => r.type === 'filtered');
+  const unrated = catRatings.filter(r => !r.rating).length;
 
   const toolbar = `<div class="toolbar">
-    <span class="period-label">걸러진 기사 · ${activeCategory.label} · 미평가 ${unrated.length}건</span>
+    <span class="period-label">평가함 · ${activeCategory.label} · 미평가 ${unrated}건</span>
     <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
   </div>`;
 
-  let cards = '';
-  const allItems = [...unrated, ...rated];
-  if (allItems.length === 0) {
-    cards = `<div class="empty-box"><div style="font-size:44px">✅</div><div>걸러진 기사가 없어요</div></div>`;
-  } else {
-    cards = allItems.map(item => {
+  function renderCards(items, label, emoji) {
+    if (items.length === 0) return '';
+    const cards = items.map(item => {
       const safeId = encodeURIComponent(item.id);
       return `<div class="review-card">
-        <span class="filter-reason">걸러진 이유: ${item.filterReason || '중복'}</span>
+        <span class="filter-reason">${emoji} ${label}${item.filterReason ? ' · ' + item.filterReason : ''}</span>
         <div class="card-top">
           <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
         </div>
@@ -453,9 +470,15 @@ function renderReview() {
         </div>
       </div>`;
     }).join('');
+    return `<div style="font-size:11px;font-weight:700;color:var(--text3);padding:4px 4px 6px;">${emoji} ${label} (${items.length}건)</div>${cards}`;
   }
 
-  wrap.innerHTML = renderCatTabsHTML() + toolbar + `<div class="content">${cards}</div>`;
+  const allEmpty = recommended.length === 0 && filtered.length === 0;
+  const content = allEmpty
+    ? `<div class="empty-box"><div style="font-size:44px">✅</div><div>평가할 기사가 없어요<br><span style="font-size:12px">뉴스 탭에서 새로고침해보세요</span></div></div>`
+    : renderCards(recommended, '추천 기사', '🗞️') + renderCards(filtered, '걸러진 기사', '🔍');
+
+  wrap.innerHTML = renderCatTabsHTML() + toolbar + `<div class="content">${content}</div>`;
 }
 
 function toggleExpand(id) {

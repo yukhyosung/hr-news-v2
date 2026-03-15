@@ -127,7 +127,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      items: deduped.slice(0, 10),       // 메인 TOP 10
+      items: deduped.slice(0, 5),        // 메인 TOP 5
       filtered: filtered.slice(0, 20),   // 검토함 (걸러진 기사)
       period: periodLabel,
       mode,
