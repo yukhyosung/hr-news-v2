@@ -76,24 +76,29 @@ export default async function handler(req, res) {
   const kstNow = getKST(now);
   const todayStr = kstNow.toISOString().split('T')[0];
 
+  // 기준 날짜: date 파라미터가 있으면 그날 기준, 없으면 오늘
+  const baseDateStr = date || todayStr;
+  const baseDate = new Date(baseDateStr + 'T12:00:00+09:00');
+
   let startDate, endDate, periodLabel;
   if (mode === 'week') {
-    const day = kstNow.getDay();
+    const day = baseDate.getDay();
     const diff = day === 0 ? 6 : day - 1;
-    const monday = new Date(kstNow);
-    monday.setDate(kstNow.getDate() - diff);
+    const monday = new Date(baseDate);
+    monday.setDate(baseDate.getDate() - diff);
     startDate = monday.toISOString().split('T')[0];
-    endDate = todayStr;
+    endDate = baseDateStr;
     periodLabel = `${startDate.slice(5).replace('-','/')} ~ ${endDate.slice(5).replace('-','/')}`;
   } else if (mode === 'month') {
-    startDate = `${kstNow.getFullYear()}-${String(kstNow.getMonth()+1).padStart(2,'0')}-01`;
-    endDate = todayStr;
-    periodLabel = `${kstNow.getFullYear()}년 ${kstNow.getMonth()+1}월`;
+    const y = baseDate.getFullYear();
+    const m = baseDate.getMonth() + 1;
+    startDate = `${y}-${String(m).padStart(2,'0')}-01`;
+    endDate = baseDateStr;
+    periodLabel = `${y}년 ${m}월`;
   } else {
-    const targetDate = date || todayStr;
-    startDate = targetDate;
-    endDate = targetDate;
-    periodLabel = targetDate === todayStr ? '오늘' : targetDate.slice(5).replace('-','/');
+    startDate = baseDateStr;
+    endDate = baseDateStr;
+    periodLabel = baseDateStr === todayStr ? '오늘' : baseDateStr.slice(5).replace('-','/');
   }
 
   function classifyTag(title, description) {
