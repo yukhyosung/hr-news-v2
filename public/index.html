@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="HR뉴스"/>
@@ -19,17 +20,12 @@
   --c1: #4f7fff; --c2: #ff6b6b; --c3: #ffb347; --c4: #4ecdc4; --c5: #a78bfa;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --tag-labor: #ff6b6b; --tag-recruit: #ffb347; --tag-reward: #4ecdc4;
-  --tag-labor-rel: #a78bfa; --tag-hr: #4f7fff;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; overflow: hidden; }
-#app { height: 100vh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+#app { height: 100dvh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
 
-.header {
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: calc(var(--safe-top) + 14px) 20px 12px; flex-shrink: 0;
-}
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: calc(var(--safe-top) + 14px) 20px 12px; flex-shrink: 0; }
 .header-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .header-title { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
 .version-tag { font-size: 9px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; font-weight: 600; }
@@ -39,38 +35,30 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .period-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .date-input { padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-size: 11px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; outline: none; flex: 1; }
 
-/* Alert Banner */
-.alert-banner { background: linear-gradient(135deg, rgba(255,179,71,0.15), rgba(255,107,107,0.1)); border-bottom: 1px solid rgba(255,179,71,0.3); padding: 10px 16px; flex-shrink: 0; animation: slideDown 0.3s ease; }
-@keyframes slideDown { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+.alert-banner { background: linear-gradient(135deg, rgba(255,179,71,0.15), rgba(255,107,107,0.1)); border-bottom: 1px solid rgba(255,179,71,0.3); padding: 10px 16px; flex-shrink: 0; }
 .alert-title { font-size: 11px; font-weight: 700; color: var(--alert); margin-bottom: 6px; }
 .alert-item { font-size: 12px; color: var(--text); padding: 5px 10px; background: rgba(255,179,71,0.1); border-radius: 8px; margin-bottom: 4px; border-left: 3px solid var(--alert); cursor: pointer; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* Keyword TOP */
-.keyword-section { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; flex-shrink: 0; }
-.keyword-title { font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
-.keyword-list { display: flex; flex-wrap: wrap; gap: 6px; }
-.keyword-chip { display: flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; }
+.keyword-section { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; flex-shrink: 0; }
+.keyword-title { font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+.keyword-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.keyword-chip { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 9px; font-size: 11px; }
 .keyword-rank { font-size: 10px; font-weight: 900; color: var(--accent); }
 .keyword-text { color: var(--text); font-weight: 600; }
 .keyword-count { font-size: 10px; color: var(--text3); }
 
-/* Category tabs */
-.cat-scroll { display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--border); scrollbar-width: none; flex-shrink: 0; }
-.cat-scroll::-webkit-scrollbar { display: none; }
-.cat-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
-.cat-btn.active { color: #fff; border-color: transparent; }
-
-.content { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+/* main content */
+#main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.content { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
 .content::-webkit-scrollbar { display: none; }
 
-.toolbar { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 0; margin-bottom: 2px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px 4px; flex-shrink: 0; }
 .period-label { font-size: 11px; color: var(--text3); }
 .refresh-btn { background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; padding: 4px 8px; }
 
-/* News Card */
 .news-card { background: var(--surface); border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
 .news-card.priority { border-color: rgba(79,127,255,0.3); }
-.card-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.card-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
 .card-num { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 1px; }
 .tag-chip { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
 .tag-노동법 { background: rgba(255,107,107,0.2); color: #ff6b6b; }
@@ -82,43 +70,40 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .card-top { display: flex; gap: 10px; align-items: flex-start; }
 .news-title { flex: 1; font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--text); text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .news-title:hover { color: var(--accent); }
-.scrap-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; flex-shrink: 0; opacity: 0.5; transition: opacity 0.2s; }
-.scrap-btn:active { opacity: 1; }
+.scrap-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; flex-shrink: 0; opacity: 0.5; }
 .news-date { font-size: 11px; color: var(--text3); margin-top: 5px; }
 .news-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-top: 10px; }
 .expand-btn { background: none; border: none; color: var(--text3); font-size: 11px; cursor: pointer; margin-top: 8px; font-family: 'Noto Sans KR', sans-serif; padding: 0; }
 
-/* Review Card */
 .review-card { background: var(--surface); border-radius: 16px; padding: 14px; border: 1px solid var(--border); }
-.filter-reason { display: inline-block; font-size: 10px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 8px; margin-bottom: 8px; }
+.filter-reason { display: inline-block; font-size: 10px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 8px; }
 .rating-row { display: flex; gap: 8px; margin-top: 10px; }
-.rate-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
+.rate-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
 .rate-btn.good { color: var(--good); border-color: var(--good); }
 .rate-btn.good.selected { background: var(--good); color: #fff; }
 .rate-btn.bad { color: var(--bad); border-color: var(--bad); }
 .rate-btn.bad.selected { background: var(--bad); color: #fff; }
 
-.empty-box { display: flex; flex-direction: column; align-items: center; padding: 60px 0; color: var(--text3); gap: 10px; font-size: 14px; }
+.empty-box { display: flex; flex-direction: column; align-items: center; padding: 60px 0; color: var(--text3); gap: 10px; font-size: 14px; text-align: center; }
 .loading-box { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px 0; color: var(--text3); font-size: 13px; }
 .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .bottom-nav { display: flex; background: var(--surface); border-top: 1px solid var(--border); padding-bottom: calc(8px + var(--safe-bottom)); flex-shrink: 0; }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 4px; border: none; background: transparent; color: var(--text3); cursor: pointer; font-size: 10px; font-family: 'Noto Sans KR', sans-serif; gap: 3px; transition: color 0.2s; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 4px; border: none; background: transparent; color: var(--text3); cursor: pointer; font-size: 10px; font-family: 'Noto Sans KR', sans-serif; gap: 3px; }
 .nav-btn.active { color: var(--accent); }
 .nav-icon { font-size: 22px; }
 .cat-chip { font-size: 10px; color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 600; display: inline-block; }
 
-.toast { position: fixed; bottom: calc(80px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); color: #fff; padding: 10px 22px; border-radius: 20px; font-size: 13px; white-space: nowrap; z-index: 999; border: 1px solid rgba(255,255,255,0.15); animation: fadeUp 0.2s ease; }
-@keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+.toast { position: fixed; bottom: calc(80px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: rgba(30,30,40,0.95); color: #fff; padding: 10px 22px; border-radius: 20px; font-size: 13px; white-space: nowrap; z-index: 999; border: 1px solid var(--border); }
 
-.settings-content { padding: 24px 20px; overflow-y: auto; height: 100%; }
+.settings-content { padding: 20px; }
 .settings-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
 .settings-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
-.info-box { background: var(--surface2); border-radius: 14px; padding: 16px 18px; font-size: 12px; color: var(--text2); line-height: 2.2; border: 1px solid var(--border); margin-bottom: 14px; }
+.info-box { background: var(--surface2); border-radius: 14px; padding: 14px 16px; font-size: 12px; color: var(--text2); line-height: 2.2; border: 1px solid var(--border); margin-bottom: 12px; }
 .info-title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 13px; }
-.export-btn { width: 100%; padding: 15px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--c4), var(--c1)); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 14px; }
-.danger-btn { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--bad); background: transparent; color: var(--bad); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 14px; }
+.export-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--c4), var(--c1)); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 12px; }
+.danger-btn { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--bad); background: transparent; color: var(--bad); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
 </style>
 </head>
 <body>
@@ -127,14 +112,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="header-top">
       <span style="font-size:22px">📰</span>
       <span class="header-title">HR 뉴스</span>
-      <span class="version-tag">v7.0</span>
+      <span class="version-tag">v7.1</span>
       <span class="header-badge">TOP 5</span>
     </div>
     <div class="period-row" id="period-row"></div>
   </div>
   <div id="alert-area"></div>
   <div id="keyword-area"></div>
-  <div id="main-content" style="flex:1;overflow:hidden;display:flex;flex-direction:column;"></div>
+  <div id="main-content"></div>
   <div class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('news')" id="nav-news">
       <span class="nav-icon">🗞️</span><span>뉴스</span>
@@ -152,7 +137,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 </div>
 
 <script>
-const VERSION = 'v7.0';
+const VERSION = 'v7.1';
+
+// ✅ localStorage 차단 대응 - 메모리 폴백
+const store = (() => {
+  const mem = {};
+  try {
+    localStorage.setItem('_test', '1');
+    localStorage.removeItem('_test');
+    return {
+      get: k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return mem[k] || null; } },
+      set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { mem[k] = v; } },
+    };
+  } catch {
+    return {
+      get: k => mem[k] || null,
+      set: (k, v) => { mem[k] = v; },
+    };
+  }
+})();
 
 function getKSTDate(offset = 0) {
   const now = new Date();
@@ -167,16 +170,17 @@ let newsCache = {};
 let reviewCache = {};
 let alertCache = {};
 let keywordCache = {};
-let scraps = JSON.parse(localStorage.getItem('hr_scraps_v7') || '[]');
-let ratings = JSON.parse(localStorage.getItem('hr_ratings_v7') || '[]');
+let scraps = store.get('hr_scraps_v7') || [];
+let ratings = store.get('hr_ratings_v7') || [];
 let expanded = null;
 let scrapFilter = 'all';
 let toastTimer = null;
+let isLoading = false;
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
-function saveScraps() { localStorage.setItem('hr_scraps_v7', JSON.stringify(scraps)); }
-function saveRatings() { localStorage.setItem('hr_ratings_v7', JSON.stringify(ratings)); }
+function saveScraps() { store.set('hr_scraps_v7', scraps); }
+function saveRatings() { store.set('hr_ratings_v7', ratings); }
 
 function showToast(msg) {
   document.querySelectorAll('.toast').forEach(e => e.remove());
@@ -184,7 +188,7 @@ function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast'; t.textContent = msg;
   document.getElementById('app').appendChild(t);
-  toastTimer = setTimeout(() => t.remove(), 2200);
+  toastTimer = setTimeout(() => t.remove(), 2500);
 }
 
 function updateLabels() {
@@ -227,8 +231,7 @@ function renderKeywords(keywords) {
           <span class="keyword-rank">${i+1}</span>
           <span class="keyword-text">${k.keyword}</span>
           <span class="keyword-count">${k.count}</span>
-        </div>
-      `).join('')}
+        </div>`).join('')}
     </div>
   </div>`;
 }
@@ -253,9 +256,7 @@ function setPeriod(mode, dateVal) {
   }
 }
 
-function getCacheKey() {
-  return `${periodMode}_${selectedDate}`;
-}
+function getCacheKey() { return `${periodMode}_${selectedDate}`; }
 
 function switchTab(tab) {
   currentTab = tab;
@@ -284,16 +285,24 @@ function getTagClass(tag) {
 const PRIORITY_KWS = ['대법원','헌법재판소','판결','입법예고','시행령','개정안','임금체불','퇴직금','통상임금','최저임금','4대보험','중대재해','특별감독','부당해고','노란봉투법','정년연장'];
 
 async function fetchNews() {
+  if (isLoading) return;
+  isLoading = true;
+
   const wrap = document.getElementById('main-content');
   document.getElementById('alert-area').innerHTML = '';
   document.getElementById('keyword-area').innerHTML = '';
-  wrap.innerHTML = `<div class="content"><div class="loading-box"><div class="spinner"></div>뉴스 수집 중... (5개 키워드 그룹)</div></div>`;
+  wrap.innerHTML = `<div class="content"><div class="loading-box"><div class="spinner"></div>뉴스 수집 중...</div></div>`;
 
   try {
     const params = new URLSearchParams({ mode: periodMode });
     if (periodMode === 'day') params.append('date', selectedDate);
     const res = await fetch(`/api/news?${params}`);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
     const key = getCacheKey();
     newsCache[key] = data.items || [];
     reviewCache[key] = data.filtered || [];
@@ -302,32 +311,29 @@ async function fetchNews() {
 
     // ratings 추가
     const existingLinks = new Set(ratings.map(r => r.link));
-    for (const item of newsCache[key]) {
+    for (const item of [...newsCache[key], ...reviewCache[key]]) {
       if (!existingLinks.has(item.link)) {
-        ratings.push({ id: item.link, link: item.link, title: item.title,
-          description: item.description, pubDate: item.pubDate, tag: item.tag,
-          category: 'all', type: 'recommended', rating: null, ratedAt: null,
-          addedAt: new Date().toISOString() });
-      }
-    }
-    for (const item of reviewCache[key]) {
-      if (!existingLinks.has(item.link)) {
-        ratings.push({ id: item.link, link: item.link, title: item.title,
+        ratings.push({
+          id: item.link, link: item.link, title: item.title,
           description: item.description, pubDate: item.pubDate,
-          filterReason: item.filterReason, category: 'all',
-          type: 'filtered', rating: null, ratedAt: null,
-          addedAt: new Date().toISOString() });
+          tag: item.tag, filterReason: item.filterReason || null,
+          type: newsCache[key].includes(item) ? 'recommended' : 'filtered',
+          rating: null, ratedAt: null, addedAt: new Date().toISOString()
+        });
+        existingLinks.add(item.link);
       }
     }
     saveRatings(); updateLabels();
     renderAlerts(alertCache[key]);
     renderKeywords(keywordCache[key]);
     if (newsCache[key].length === 0) showToast('📭 해당 기간 기사가 없어요');
-  } catch {
+  } catch(e) {
     const key = getCacheKey();
     newsCache[key] = []; reviewCache[key] = []; alertCache[key] = []; keywordCache[key] = [];
-    showToast('❌ 뉴스를 불러오지 못했어요');
+    showToast(`❌ 오류: ${e.message}`);
   }
+
+  isLoading = false;
   currentTab === 'review' ? renderReview() : renderNews();
 }
 
@@ -366,14 +372,9 @@ function renderNews() {
   const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' :
     selectedDate === getKSTDate(0) ? '오늘' : selectedDate === getKSTDate(1) ? '어제' : selectedDate.slice(5).replace('-','/');
 
-  const toolbar = `<div class="toolbar">
-    <span class="period-label">${periodText} · ${items.length}건</span>
-    <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
-  </div>`;
-
   let cards = '';
   if (items.length === 0) {
-    cards = `<div class="empty-box"><div style="font-size:44px">📭</div><div>해당 기간 기사가 없어요</div></div>`;
+    cards = `<div class="empty-box"><div style="font-size:44px">📭</div><div>해당 기간 기사가 없어요<br><span style="font-size:12px;color:var(--text3)">새로고침을 눌러보세요</span></div></div>`;
   } else {
     cards = items.map((item, i) => {
       const isExp = expanded === item.link;
@@ -397,7 +398,12 @@ function renderNews() {
     }).join('');
   }
 
-  wrap.innerHTML = toolbar + `<div class="content">${cards}</div>`;
+  wrap.innerHTML = `
+    <div class="toolbar">
+      <span class="period-label">${periodText} · ${items.length}건</span>
+      <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
+    </div>
+    <div class="content">${cards}</div>`;
 }
 
 function renderReview() {
@@ -406,24 +412,17 @@ function renderReview() {
   const filtered = ratings.filter(r => r.type === 'filtered');
   const unrated = ratings.filter(r => !r.rating).length;
 
-  const toolbar = `<div class="toolbar">
-    <span class="period-label">평가함 · 미평가 ${unrated}건</span>
-    <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
-  </div>`;
-
   function renderCards(items, label, emoji) {
     if (items.length === 0) return '';
     const cards = items.map(item => {
       const safeId = encodeURIComponent(item.id);
       const tagClass = getTagClass(item.tag);
       return `<div class="review-card">
-        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
           ${item.tag ? `<span class="tag-chip ${tagClass}">${item.tag}</span>` : ''}
           <span class="filter-reason">${emoji} ${label}${item.filterReason ? ' · ' + item.filterReason : ''}</span>
         </div>
-        <div class="card-top">
-          <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
-        </div>
+        <a href="${item.link}" target="_blank" class="news-title" style="display:block;margin-bottom:4px;">${item.title}</a>
         <div class="news-date">${formatDate(item.pubDate)}</div>
         <div class="rating-row">
           <button class="rate-btn good ${item.rating==='good'?'selected':''}" onclick="rateArticle(decodeURIComponent('${safeId}'),'good')">👍 유용</button>
@@ -436,10 +435,15 @@ function renderReview() {
 
   const allEmpty = recommended.length === 0 && filtered.length === 0;
   const content = allEmpty
-    ? `<div class="empty-box"><div style="font-size:44px">✅</div><div>평가할 기사가 없어요</div></div>`
+    ? `<div class="empty-box"><div style="font-size:44px">✅</div><div>평가할 기사가 없어요<br><span style="font-size:12px">뉴스 탭에서 새로고침해보세요</span></div></div>`
     : renderCards(recommended, '추천 기사', '🗞️') + renderCards(filtered, '걸러진 기사', '🔍');
 
-  wrap.innerHTML = toolbar + `<div class="content">${content}</div>`;
+  wrap.innerHTML = `
+    <div class="toolbar">
+      <span class="period-label">평가함 · 미평가 ${unrated}건</span>
+      <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
+    </div>
+    <div class="content">${content}</div>`;
 }
 
 function toggleExpand(id) {
@@ -457,15 +461,12 @@ function refreshNews() {
 function renderScraps() {
   const filtered = scrapFilter === 'all' ? scraps : scraps.filter(s => s.tag === scrapFilter);
   const wrap = document.getElementById('main-content');
-
   const tags = [...new Set(scraps.map(s => s.tag).filter(Boolean))];
-  const filterTabs = `<div class="cat-scroll">
-    <button class="cat-btn${scrapFilter==='all'?' active':''}" style="${scrapFilter==='all'?'background:#333;color:#fff;':''}" onclick="setScrapFilter('all')">전체(${scraps.length})</button>
-    ${tags.map(tag => {
-      const cnt = scraps.filter(s => s.tag === tag).length;
-      return `<button class="cat-btn${scrapFilter===tag?' active':''}" onclick="setScrapFilter('${tag}')">${tag}(${cnt})</button>`;
-    }).join('')}
-  </div>`;
+
+  const filterTabs = tags.length > 0 ? `<div style="display:flex;gap:6px;padding:10px 16px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--border);scrollbar-width:none;">
+    <button style="padding:5px 12px;border-radius:20px;border:1.5px solid ${scrapFilter==='all'?'#333':'var(--border)'};background:${scrapFilter==='all'?'#333':'transparent'};color:${scrapFilter==='all'?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;" onclick="setScrapFilter('all')">전체(${scraps.length})</button>
+    ${tags.map(tag => `<button style="padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;" onclick="setScrapFilter('${tag}')">${tag}(${scraps.filter(s=>s.tag===tag).length})</button>`).join('')}
+  </div>` : '';
 
   let cards = '';
   if (filtered.length === 0) {
@@ -491,7 +492,7 @@ function renderScraps() {
 function setScrapFilter(f) { scrapFilter = f; renderScraps(); }
 
 function exportRatings() {
-  const data = { exportedAt: new Date().toISOString(), version: VERSION, totalRatings: ratings.length, ratedCount: ratings.filter(r => r.rating).length, goodCount: ratings.filter(r => r.rating === 'good').length, badCount: ratings.filter(r => r.rating === 'bad').length, ratings };
+  const data = { exportedAt: new Date().toISOString(), version: VERSION, totalRatings: ratings.length, goodCount: ratings.filter(r=>r.rating==='good').length, badCount: ratings.filter(r=>r.rating==='bad').length, ratings };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -508,21 +509,18 @@ function clearRatings() {
 
 function renderSettings() {
   const wrap = document.getElementById('main-content');
-  const goodCount = ratings.filter(r => r.rating === 'good').length;
-  const badCount = ratings.filter(r => r.rating === 'bad').length;
   wrap.innerHTML = `<div class="content"><div class="settings-content">
     <div class="settings-title">⚙️ 설정</div>
     <p class="settings-desc">HR 뉴스 ${VERSION}<br>스타벅스 인사팀 맞춤 뉴스 앱</p>
     <div class="info-box">
       <div class="info-title">📊 평가 데이터 현황</div>
-      <div>전체: ${ratings.length}건 · 👍 ${goodCount} · 👎 ${badCount} · 미평가 ${ratings.filter(r=>!r.rating).length}</div>
+      <div>전체: ${ratings.length}건 · 👍 ${ratings.filter(r=>r.rating==='good').length} · 👎 ${ratings.filter(r=>r.rating==='bad').length} · 미평가 ${ratings.filter(r=>!r.rating).length}</div>
       <div style="margin-top:4px;color:var(--text3);font-size:11px;">데이터 내보내기 → Claude에게 전달 → v8 업데이트</div>
     </div>
     <button class="export-btn" onclick="exportRatings()">📥 평가 데이터 내보내기</button>
     <div class="info-box">
       <div class="info-title">🏷️ 자동 태그 분류</div>
       <div>노동법 · 채용 · 보상 · 노사 · HR트렌드</div>
-      <div style="margin-top:4px;color:var(--text3);font-size:11px;">키워드 기반 자동 분류</div>
     </div>
     <div class="info-box">
       <div class="info-title">🔍 검색 키워드 그룹 (5개)</div>
