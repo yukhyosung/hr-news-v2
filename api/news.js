@@ -11,42 +11,35 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Naver API keys not configured' });
   }
 
-  // ✅ 5개 그룹 키워드 세트 (API 5회 호출)
   const KEYWORD_GROUPS = [
-    { id: 'labor',   label: '노동법·정책', keyword: '근로기준법 노동법개정 주52시간 포괄임금제 통상임금 최저임금 고용노동부' },
-    { id: 'recruit', label: '채용·취업',   keyword: '채용시장 공채 경력채용 인재확보 채용트렌드 신입채용 구직시장' },
-    { id: 'reward',  label: '보상·임금',   keyword: '임금인상 성과급 연봉협상 임금체계 보상제도 퇴직금 임금체불' },
-    { id: 'labor_rel', label: '노사관계',  keyword: '노조 파업 단체협약 노사갈등 노동분쟁 쟁의 임금교섭' },
-    { id: 'hr_trend', label: 'HR트렌드',   keyword: '조직문화 HR트렌드 인사전략 HR테크 재택근무 유연근무 인사제도' },
+    { keyword: '근로기준법 노동법개정 주52시간 포괄임금제 통상임금 최저임금 고용노동부' },
+    { keyword: '채용시장 공채 경력채용 인재확보 채용트렌드 신입채용 구직시장' },
+    { keyword: '임금인상 성과급 연봉협상 임금체계 보상제도 퇴직금 임금체불' },
+    { keyword: '노조 파업 단체협약 노사갈등 노동분쟁 쟁의 임금교섭' },
+    { keyword: '조직문화 HR트렌드 인사전략 HR테크 재택근무 유연근무 인사제도' },
   ];
 
-  // 🏷️ 태그 매핑 - 제목/본문 키워드 → 태그
   const TAG_RULES = [
-    { tag: '노동법', keywords: ['근로기준법','노동법','주52시간','포괄임금','통상임금','최저임금','근로시간','고용노동부','입법예고','시행령','법 개정','판결','대법원','헌법재판소','행정해석','노동부','중대재해'] },
-    { tag: '채용',   keywords: ['채용','공채','경력채용','신입채용','채용시장','구직','취업','인재확보','헤드헌팅','채용공고'] },
-    { tag: '보상',   keywords: ['임금','성과급','연봉','퇴직금','보상','급여','수당','인상','임금체불','통상임금'] },
+    { tag: '노동법', keywords: ['근로기준법','노동법','주52시간','포괄임금','통상임금','최저임금','근로시간','고용노동부','입법예고','시행령','법 개정','판결','대법원','헌법재판소','행정해석','중대재해'] },
+    { tag: '채용',   keywords: ['채용','공채','경력채용','신입채용','채용시장','구직','취업','인재확보','헤드헌팅'] },
+    { tag: '보상',   keywords: ['임금','성과급','연봉','퇴직금','보상','급여','수당','임금체불','통상임금'] },
     { tag: '노사',   keywords: ['노조','파업','단체협약','노사갈등','쟁의','노동분쟁','교섭','노동위원회','부당해고','징계'] },
-    { tag: 'HR트렌드', keywords: ['조직문화','HR트렌드','인사전략','HR테크','재택','유연근무','인사제도','MZ','직장문화','복지'] },
+    { tag: 'HR트렌드', keywords: ['조직문화','HR트렌드','인사전략','HR테크','재택','유연근무','인사제도','복지'] },
   ];
 
-  // ❌ 노이즈 필터
   const NOISE_KEYWORDS = [
     '합격','불합격','시험일정','시험공고','접수기간','원서접수',
     '자격증','취득후기','공부법','공부방법','강의추천','인강',
     '노무사 시험','노무사 합격',
     '입사지원','지원하기','모집공고',
     '이직후기','취업후기','면접후기',
-    '취임','임명','청장','인사발령','임원 선임','신임 대표','신임 청장',
-    '부임','승진 인사',
+    '취임','임명','청장','인사발령','임원 선임','신임 대표','신임 청장','부임',
     '러닝화','스니커즈','출근 복장',
-    '무료법률상담','출범식','개소식',
-    '수강신청','어깨동무','MOU 체결',
+    '출범식','개소식','수강신청','어깨동무','MOU 체결',
     '주식','코스피','코스닥','펀드',
-    '화물연대','경윳값','건설현장 사고',
-    '할인','이벤트','프로모션',
+    '화물연대','경윳값','할인','이벤트','프로모션',
   ];
 
-  // 🔔 알림 키워드
   const ALERT_KEYWORDS = [
     '입법예고','법률 개정','시행령 개정','근로기준법 개정',
     '대법원 판결','헌법재판소 결정',
@@ -54,14 +47,25 @@ export default async function handler(req, res) {
     '중대재해','특별감독','통상임금','퇴직금 산정',
   ];
 
-  // 📊 HR 키워드 빈도 분석용 키워드 목록
   const FREQ_KEYWORDS = [
     '주52시간','최저임금','통상임금','퇴직금','성과급','임금인상','포괄임금',
     '노조','파업','단체교섭','노사갈등','부당해고','징계','근로시간',
-    '채용','공채','경력채용','구직','취업','인재',
+    '채용','공채','경력채용','구직','취업',
     '재택근무','유연근무','조직문화','HR트렌드',
-    '중대재해','산업재해','고용노동부','노동법','근로기준법',
-    '노란봉투법','정년연장','4대보험','육아휴직','출산',
+    '중대재해','고용노동부','노동법','근로기준법',
+    '노란봉투법','정년연장','4대보험','육아휴직',
+  ];
+
+  // 이슈 클러스터링 키워드 (제목에서 추출할 핵심 이슈어)
+  const ISSUE_KEYWORDS = [
+    '노란봉투법','중대재해처벌법','최저임금','통상임금','퇴직금','주52시간','포괄임금',
+    '정년연장','육아휴직','출산휴가','4대보험','고용보험','산재보험',
+    '노조','파업','단체교섭','임금체불','부당해고',
+    '채용','공채','경력채용','희망퇴직','구조조정',
+    '성과급','연봉','임금인상','임금협상',
+    '재택근무','유연근무','주4일','워라밸',
+    '조직문화','직장내괴롭힘','성희롱',
+    '고용노동부','근로감독','특별감독',
   ];
 
   function getKST(d) {
@@ -92,7 +96,6 @@ export default async function handler(req, res) {
     periodLabel = targetDate === todayStr ? '오늘' : targetDate.slice(5).replace('-','/');
   }
 
-  // 태그 분류 함수
   function classifyTag(title, description) {
     const text = title + ' ' + description;
     const scores = TAG_RULES.map(rule => ({
@@ -103,7 +106,15 @@ export default async function handler(req, res) {
     return scores[0].score > 0 ? scores[0].tag : null;
   }
 
-  // 키워드 빈도 분석 함수
+  function extractIssueKeyword(title) {
+    // 제목에서 가장 먼저 매칭되는 이슈 키워드 반환
+    for (const kw of ISSUE_KEYWORDS) {
+      if (title.includes(kw)) return kw;
+    }
+    // 없으면 제목 앞 10자 기준 (느슨한 그룹핑)
+    return null;
+  }
+
   function analyzeKeywords(items) {
     const freq = {};
     for (const item of items) {
@@ -118,21 +129,23 @@ export default async function handler(req, res) {
       .map(([kw, count]) => ({ keyword: kw, count }));
   }
 
+  const PRIORITY_KWS = ['대법원','헌법재판소','판결','입법예고','시행령','개정안','임금체불','퇴직금','통상임금','최저임금','4대보험','중대재해','특별감독','부당해고','노란봉투법','정년연장'];
+
   try {
     // 5개 그룹 병렬 API 호출
     const groupResults = await Promise.all(
       KEYWORD_GROUPS.map(async group => {
         const query = encodeURIComponent(group.keyword);
-        const res = await fetch(
+        const r = await fetch(
           `https://openapi.naver.com/v1/search/news.json?query=${query}&display=100&sort=date`,
           { headers: { 'X-Naver-Client-Id': clientId, 'X-Naver-Client-Secret': clientSecret } }
         );
-        const data = await res.json();
-        return data.items || [];
+        const d = await r.json();
+        return d.items || [];
       })
     );
 
-    // 전체 기사 합치기 + 날짜 필터
+    // 합치기 + 날짜 필터
     const allItems = [];
     const seenLinks = new Set();
     for (const items of groupResults) {
@@ -155,7 +168,7 @@ export default async function handler(req, res) {
     }
 
     if (allItems.length === 0) {
-      return res.status(200).json({ items: [], filtered: [], alerts: [], topKeywords: [], period: periodLabel, mode });
+      return res.status(200).json({ issues: [], filtered: [], alerts: [], topKeywords: [], period: periodLabel, mode });
     }
 
     // 노이즈 필터
@@ -167,38 +180,74 @@ export default async function handler(req, res) {
       if (noiseKw) {
         filtered.push({ ...item, filterReason: noiseKw });
       } else {
-        // 태그 분류 + 우선순위 점수
         const tag = classifyTag(item.title, item.description);
-        const PRIORITY_KWS = ['대법원','헌법재판소','판결','입법예고','시행령','개정안','임금체불','퇴직금','통상임금','최저임금','4대보험','중대재해','특별감독','기획감독','부당해고','노란봉투법','정년연장'];
         const score = PRIORITY_KWS.filter(kw => item.title.includes(kw)).length;
-        passed.push({ ...item, tag, score });
+        const issueKw = extractIssueKeyword(item.title);
+        passed.push({ ...item, tag, score, issueKw });
       }
     }
 
-    // 우선순위 정렬 후 중복 제거
+    // 우선순위 정렬
     passed.sort((a, b) => b.score - a.score);
-    const deduped = [];
-    const seenTokens = [];
+
+    // 이슈 클러스터링
+    const issueMap = {}; // issueKw → { articles[] }
+    const noIssueArticles = [];
+    const seenTitles = new Set();
+
     for (const item of passed) {
+      // 제목 중복 체크 (토큰 유사도)
       const tokens = item.title.replace(/[^\w가-힣\s]/g, '').split(/\s+/).filter(t => t.length >= 2).slice(0, 8);
-      const isDuplicate = seenTokens.some(seen => {
-        const overlap = tokens.filter(t => seen.includes(t)).length;
-        return overlap / Math.max(tokens.length, seen.length) >= 0.5;
-      });
-      if (!isDuplicate) { deduped.push(item); seenTokens.push(tokens); }
-      else filtered.push({ ...item, filterReason: '중복' });
+      let isDup = false;
+      for (const seen of seenTitles) {
+        const seenTokens = seen.split('|');
+        const overlap = tokens.filter(t => seenTokens.includes(t)).length;
+        if (overlap / Math.max(tokens.length, seenTokens.length) >= 0.5) { isDup = true; break; }
+      }
+      if (isDup) { filtered.push({ ...item, filterReason: '중복' }); continue; }
+      seenTitles.add(tokens.join('|'));
+
+      if (item.issueKw) {
+        if (!issueMap[item.issueKw]) {
+          issueMap[item.issueKw] = { issueKw: item.issueKw, articles: [], tag: item.tag, maxScore: 0 };
+        }
+        issueMap[item.issueKw].articles.push(item);
+        if (item.score > issueMap[item.issueKw].maxScore) {
+          issueMap[item.issueKw].maxScore = item.score;
+          issueMap[item.issueKw].tag = item.tag;
+        }
+      } else {
+        noIssueArticles.push(item);
+      }
     }
 
+    // 이슈 점수 계산 및 정렬
+    const issues = Object.values(issueMap).map(issue => {
+      const mainArticle = issue.articles[0]; // 이미 score 기준 정렬됨
+      const relatedArticles = issue.articles.slice(1);
+      const issueScore = mainArticle.score + relatedArticles.length * 0.5;
+      return { issueKw: issue.issueKw, mainArticle, relatedArticles, tag: issue.tag, issueScore };
+    });
+    issues.sort((a, b) => b.issueScore - a.issueScore);
+
+    // 이슈 없는 기사도 단독 이슈로 추가
+    for (const item of noIssueArticles) {
+      issues.push({ issueKw: null, mainArticle: item, relatedArticles: [], tag: item.tag, issueScore: item.score });
+    }
+
+    const top5Issues = issues.slice(0, 5);
+
     // 키워드 빈도 분석
-    const topKeywords = analyzeKeywords(deduped.slice(0, 20));
+    const allPassedItems = passed.filter(p => !filtered.find(f => f.link === p.link));
+    const topKeywords = analyzeKeywords(allPassedItems);
 
     // 알림 감지
     const alerts = [];
     const alertSeen = new Set();
-    for (const item of deduped.slice(0, 10)) {
+    for (const issue of top5Issues) {
       for (const kw of ALERT_KEYWORDS) {
-        if (item.title.includes(kw) && !alertSeen.has(kw)) {
-          alerts.push({ keyword: kw, title: item.title, link: item.link });
+        if (issue.mainArticle.title.includes(kw) && !alertSeen.has(kw)) {
+          alerts.push({ keyword: kw, title: issue.mainArticle.title, link: issue.mainArticle.link });
           alertSeen.add(kw);
           break;
         }
@@ -206,7 +255,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      items: deduped.slice(0, 5),
+      issues: top5Issues,
       filtered: filtered.slice(0, 30),
       alerts,
       topKeywords,
