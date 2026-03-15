@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="HR뉴스"/>
+<meta name="theme-color" content="#0f0f14"/>
+<link rel="manifest" href="/manifest.json"/>
+<title>HR 뉴스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0f0f14; --surface: #1a1a24; --surface2: #22222f;
+  --border: #2a2a3a; --text: #f0f0f5; --text2: #8888a0; --text3: #44445a;
+  --accent: #4f7fff; --good: #4ecdc4; --bad: #ff6b6b; --alert: #ffb347;
+  --c1: #4f7fff; --c2: #ff6b6b; --c3: #ffb347; --c4: #4ecdc4; --c5: #a78bfa;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; overflow: hidden; }
+#app { height: 100dvh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: calc(var(--safe-top) + 14px) 20px 12px; flex-shrink: 0; }
+.header-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.header-title { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+.version-tag { font-size: 9px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; font-weight: 600; }
+.header-badge { margin-left: auto; font-size: 10px; color: var(--accent); background: rgba(79,127,255,0.12); border: 1px solid rgba(79,127,255,0.25); padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+.period-row { display: flex; gap: 6px; align-items: center; }
+.period-btn { padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--text2); font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; white-space: nowrap; }
+.period-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.date-input { padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); font-size: 11px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; outline: none; flex: 1; }
+
+.alert-banner { background: linear-gradient(135deg, rgba(255,179,71,0.15), rgba(255,107,107,0.1)); border-bottom: 1px solid rgba(255,179,71,0.3); padding: 10px 16px; flex-shrink: 0; }
+.alert-title { font-size: 11px; font-weight: 700; color: var(--alert); margin-bottom: 6px; }
+.alert-item { font-size: 12px; color: var(--text); padding: 5px 10px; background: rgba(255,179,71,0.1); border-radius: 8px; margin-bottom: 4px; border-left: 3px solid var(--alert); cursor: pointer; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+.keyword-section { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; flex-shrink: 0; }
+.keyword-title { font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+.keyword-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.keyword-chip { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 9px; font-size: 11px; }
+.keyword-rank { font-size: 10px; font-weight: 900; color: var(--accent); }
+.keyword-text { color: var(--text); font-weight: 600; }
+.keyword-count { font-size: 10px; color: var(--text3); }
+
+#main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.content { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+.content::-webkit-scrollbar { display: none; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px 4px; flex-shrink: 0; }
+.period-label { font-size: 11px; color: var(--text3); }
+.refresh-btn { background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; padding: 4px 8px; }
+
+/* Issue Card */
+.issue-card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+.issue-card.priority { border-color: rgba(79,127,255,0.35); }
+.issue-header { padding: 14px 16px 10px; }
+.issue-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.issue-num { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 1px; }
+.issue-kw-badge { font-size: 10px; font-weight: 700; background: rgba(79,127,255,0.15); color: var(--accent); border: 1px solid rgba(79,127,255,0.3); padding: 2px 8px; border-radius: 6px; }
+.tag-chip { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+.tag-노동법 { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+.tag-채용 { background: rgba(255,179,71,0.2); color: #ffb347; }
+.tag-보상 { background: rgba(78,205,196,0.2); color: #4ecdc4; }
+.tag-노사 { background: rgba(167,139,250,0.2); color: #a78bfa; }
+.tag-HR트렌드 { background: rgba(79,127,255,0.2); color: #4f7fff; }
+.priority-tag { font-size: 9px; font-weight: 700; color: var(--alert); background: rgba(255,179,71,0.15); border: 1px solid rgba(255,179,71,0.3); padding: 1px 7px; border-radius: 6px; }
+
+.main-article { display: flex; gap: 10px; align-items: flex-start; }
+.news-title { flex: 1; font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--text); text-decoration: none; }
+.news-title:hover { color: var(--accent); }
+.scrap-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; flex-shrink: 0; opacity: 0.5; }
+.news-date { font-size: 11px; color: var(--text3); margin-top: 5px; }
+.news-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-top: 8px; }
+
+/* Related Articles */
+.related-toggle { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-top: 1px solid var(--border); cursor: pointer; background: var(--surface2); }
+.related-count { font-size: 11px; color: var(--text2); font-weight: 600; }
+.related-arrow { font-size: 11px; color: var(--text3); }
+.related-list { border-top: 1px solid var(--border); }
+.related-item { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: flex-start; }
+.related-item:last-child { border-bottom: none; }
+.related-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); flex-shrink: 0; margin-top: 7px; }
+.related-title { font-size: 13px; color: var(--text2); text-decoration: none; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+.related-title:hover { color: var(--text); }
+.related-date { font-size: 10px; color: var(--text3); margin-top: 3px; white-space: nowrap; }
+
+.expand-btn { background: none; border: none; color: var(--text3); font-size: 11px; cursor: pointer; margin-top: 6px; font-family: 'Noto Sans KR', sans-serif; padding: 0; display: block; }
+
+/* Review & other cards */
+.news-card { background: var(--surface); border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
+.review-card { background: var(--surface); border-radius: 16px; padding: 14px; border: 1px solid var(--border); }
+.filter-reason { display: inline-block; font-size: 10px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 8px; }
+.rating-row { display: flex; gap: 8px; margin-top: 10px; }
+.rate-btn { flex: 1; padding: 8px; border-radius: 10px; border: 1.5px solid var(--border); background: transparent; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+.rate-btn.good { color: var(--good); border-color: var(--good); }
+.rate-btn.good.selected { background: var(--good); color: #fff; }
+.rate-btn.bad { color: var(--bad); border-color: var(--bad); }
+.rate-btn.bad.selected { background: var(--bad); color: #fff; }
+
+.empty-box { display: flex; flex-direction: column; align-items: center; padding: 60px 0; color: var(--text3); gap: 10px; font-size: 14px; text-align: center; }
+.loading-box { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px 0; color: var(--text3); font-size: 13px; }
+.spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.bottom-nav { display: flex; background: var(--surface); border-top: 1px solid var(--border); padding-bottom: calc(8px + var(--safe-bottom)); flex-shrink: 0; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 4px; border: none; background: transparent; color: var(--text3); cursor: pointer; font-size: 10px; font-family: 'Noto Sans KR', sans-serif; gap: 3px; }
+.nav-btn.active { color: var(--accent); }
+.nav-icon { font-size: 22px; }
+
+.toast { position: fixed; bottom: calc(80px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: rgba(30,30,40,0.95); color: #fff; padding: 10px 22px; border-radius: 20px; font-size: 13px; white-space: nowrap; z-index: 999; border: 1px solid var(--border); }
+
+.settings-content { padding: 20px; }
+.settings-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.settings-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
+.info-box { background: var(--surface2); border-radius: 14px; padding: 14px 16px; font-size: 12px; color: var(--text2); line-height: 2.2; border: 1px solid var(--border); margin-bottom: 12px; }
+.info-title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 13px; }
+.export-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--c4), var(--c1)); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-bottom: 12px; }
+.danger-btn { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid var(--bad); background: transparent; color: var(--bad); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-top">
+      <span style="font-size:22px">📰</span>
+      <span class="header-title">HR 뉴스</span>
+      <span class="version-tag">v8.0</span>
+      <span class="header-badge">이슈 TOP 5</span>
+    </div>
+    <div class="period-row" id="period-row"></div>
+  </div>
+  <div id="alert-area"></div>
+  <div id="keyword-area"></div>
+  <div id="main-content"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('news')" id="nav-news">
+      <span class="nav-icon">🗞️</span><span>뉴스</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('review')" id="nav-review">
+      <span class="nav-icon">🔍</span><span id="nav-review-label">검토함</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('scraps')" id="nav-scraps">
+      <span class="nav-icon">📌</span><span id="nav-scrap-label">스크랩</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('settings')" id="nav-settings">
+      <span class="nav-icon">⚙️</span><span>설정</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const VERSION = 'v8.0';
+
+const store = (() => {
+  const mem = {};
+  try {
+    localStorage.setItem('_t', '1'); localStorage.removeItem('_t');
+    return {
+      get: k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return mem[k] || null; } },
+      set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { mem[k] = v; } },
+    };
+  } catch {
+    return { get: k => mem[k] || null, set: (k, v) => { mem[k] = v; } };
+  }
+})();
+
+function getKSTDate(offset = 0) {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000 - offset * 86400000);
+  return kst.toISOString().split('T')[0];
+}
+
+let currentTab = 'news';
+let periodMode = 'day';
+let selectedDate = getKSTDate(0);
+let issueCache = {};
+let reviewCache = {};
+let alertCache = {};
+let keywordCache = {};
+let scraps = store.get('hr_scraps_v8') || [];
+let ratings = store.get('hr_ratings_v8') || [];
+let expandedIssue = null;  // 펼쳐진 관련기사
+let expandedDesc = null;   // 펼쳐진 본문
+let scrapFilter = 'all';
+let toastTimer = null;
+let isLoading = false;
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+function saveScraps() { store.set('hr_scraps_v8', scraps); }
+function saveRatings() { store.set('hr_ratings_v8', ratings); }
+
+function showToast(msg) {
+  document.querySelectorAll('.toast').forEach(e => e.remove());
+  if (toastTimer) clearTimeout(toastTimer);
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.getElementById('app').appendChild(t);
+  toastTimer = setTimeout(() => t.remove(), 2500);
+}
+
+function updateLabels() {
+  const sl = document.getElementById('nav-scrap-label');
+  if (sl) sl.textContent = scraps.length > 0 ? `스크랩(${scraps.length})` : '스크랩';
+  const unrated = ratings.filter(r => !r.rating).length;
+  const rl = document.getElementById('nav-review-label');
+  if (rl) rl.textContent = unrated > 0 ? `검토함(${unrated})` : '검토함';
+}
+
+function renderPeriodRow() {
+  const today = getKSTDate(0);
+  document.getElementById('period-row').innerHTML = `
+    <button class="period-btn ${periodMode==='day'&&selectedDate===today?'active':''}" onclick="setPeriod('day','today')">오늘</button>
+    <button class="period-btn ${periodMode==='day'&&selectedDate===getKSTDate(1)?'active':''}" onclick="setPeriod('day','yesterday')">어제</button>
+    <button class="period-btn ${periodMode==='week'?'active':''}" onclick="setPeriod('week')">이번주</button>
+    <button class="period-btn ${periodMode==='month'?'active':''}" onclick="setPeriod('month')">이번달</button>
+    <input type="date" class="date-input" value="${selectedDate}" max="${today}" onchange="setPeriod('day',this.value)"/>
+  `;
+}
+
+function renderAlerts(alerts) {
+  const area = document.getElementById('alert-area');
+  if (!alerts || alerts.length === 0) { area.innerHTML = ''; return; }
+  area.innerHTML = `<div class="alert-banner">
+    <div class="alert-title">🔔 중요 이슈 감지!</div>
+    ${alerts.map(a => `<div class="alert-item" onclick="window.open('${a.link}','_blank')">${a.title}</div>`).join('')}
+  </div>`;
+}
+
+function renderKeywords(keywords) {
+  const area = document.getElementById('keyword-area');
+  if (!keywords || keywords.length === 0) { area.innerHTML = ''; return; }
+  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' : selectedDate === getKSTDate(0) ? '오늘' : '선택일';
+  area.innerHTML = `<div class="keyword-section">
+    <div class="keyword-title">📊 ${periodText} HR 키워드 TOP</div>
+    <div class="keyword-list">
+      ${keywords.map((k, i) => `<div class="keyword-chip"><span class="keyword-rank">${i+1}</span><span class="keyword-text">${k.keyword}</span><span class="keyword-count">${k.count}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function setPeriod(mode, dateVal) {
+  periodMode = mode;
+  if (mode === 'day') {
+    if (dateVal === 'today') selectedDate = getKSTDate(0);
+    else if (dateVal === 'yesterday') selectedDate = getKSTDate(1);
+    else selectedDate = dateVal;
+  }
+  expandedIssue = null; expandedDesc = null;
+  renderPeriodRow();
+  if (currentTab === 'news' || currentTab === 'review') {
+    const key = getCacheKey();
+    if (!issueCache[key]) fetchNews();
+    else { renderAlerts(alertCache[key]); renderKeywords(keywordCache[key]); currentTab === 'news' ? renderNews() : renderReview(); }
+  }
+}
+
+function getCacheKey() { return `${periodMode}_${selectedDate}`; }
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + tab)?.classList.add('active');
+  if (tab !== 'news' && tab !== 'review') {
+    document.getElementById('alert-area').innerHTML = '';
+    document.getElementById('keyword-area').innerHTML = '';
+  }
+  render();
+}
+
+function formatDate(str) {
+  try {
+    const d = new Date(str);
+    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    return `${kst.getMonth()+1}/${kst.getDate()} ${kst.getHours()}:${String(kst.getMinutes()).padStart(2,'0')}`;
+  } catch { return str; }
+}
+
+function getTagClass(tag) {
+  const map = { '노동법': 'tag-노동법', '채용': 'tag-채용', '보상': 'tag-보상', '노사': 'tag-노사', 'HR트렌드': 'tag-HR트렌드' };
+  return map[tag] || '';
+}
+
+const PRIORITY_KWS = ['대법원','헌법재판소','판결','입법예고','시행령','개정안','임금체불','퇴직금','통상임금','최저임금','4대보험','중대재해','특별감독','부당해고','노란봉투법','정년연장'];
+
+async function fetchNews() {
+  if (isLoading) return;
+  isLoading = true;
+
+  const wrap = document.getElementById('main-content');
+  document.getElementById('alert-area').innerHTML = '';
+  document.getElementById('keyword-area').innerHTML = '';
+  wrap.innerHTML = `<div class="content"><div class="loading-box"><div class="spinner"></div>이슈 분석 중...</div></div>`;
+
+  try {
+    const params = new URLSearchParams({ mode: periodMode, date: selectedDate });
+    const res = await fetch(`/api/news?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    const key = getCacheKey();
+    issueCache[key] = data.issues || [];
+    reviewCache[key] = data.filtered || [];
+    alertCache[key] = data.alerts || [];
+    keywordCache[key] = data.topKeywords || [];
+
+    // ratings 추가
+    const existingLinks = new Set(ratings.map(r => r.link));
+    for (const issue of issueCache[key]) {
+      const allArticles = [issue.mainArticle, ...issue.relatedArticles];
+      for (const item of allArticles) {
+        if (!existingLinks.has(item.link)) {
+          ratings.push({ id: item.link, link: item.link, title: item.title, description: item.description, pubDate: item.pubDate, tag: issue.tag, type: 'recommended', rating: null, ratedAt: null, addedAt: new Date().toISOString() });
+          existingLinks.add(item.link);
+        }
+      }
+    }
+    for (const item of reviewCache[key]) {
+      if (!existingLinks.has(item.link)) {
+        ratings.push({ id: item.link, link: item.link, title: item.title, description: item.description, pubDate: item.pubDate, filterReason: item.filterReason, type: 'filtered', rating: null, ratedAt: null, addedAt: new Date().toISOString() });
+        existingLinks.add(item.link);
+      }
+    }
+    saveRatings(); updateLabels();
+    renderAlerts(alertCache[key]);
+    renderKeywords(keywordCache[key]);
+    if (issueCache[key].length === 0) showToast('📭 해당 기간 기사가 없어요');
+  } catch(e) {
+    const key = getCacheKey();
+    issueCache[key] = []; reviewCache[key] = []; alertCache[key] = []; keywordCache[key] = [];
+    showToast(`❌ 오류: ${e.message}`);
+  }
+  isLoading = false;
+  currentTab === 'review' ? renderReview() : renderNews();
+}
+
+function scrap(itemId, title, link, tag) {
+  if (scraps.find(s => s.id === itemId)) { showToast('이미 스크랩된 기사예요'); return; }
+  scraps.unshift({ id: itemId, title, link, tag, scrapDate: new Date().toISOString() });
+  saveScraps(); updateLabels();
+  showToast('✅ 스크랩 완료!');
+}
+
+function deleteScrap(itemId) {
+  scraps = scraps.filter(s => s.id !== itemId);
+  saveScraps(); updateLabels();
+  showToast('🗑️ 삭제됐어요');
+  renderScraps();
+}
+
+function rateArticle(itemId, rating) {
+  const idx = ratings.findIndex(r => r.id === itemId);
+  if (idx === -1) return;
+  ratings[idx].rating = rating;
+  ratings[idx].ratedAt = new Date().toISOString();
+  saveRatings(); updateLabels();
+  showToast(rating === 'good' ? '👍 유용으로 평가됐어요' : '👎 불필요로 평가됐어요');
+  renderReview();
+}
+
+function toggleRelated(issueIdx) {
+  expandedIssue = expandedIssue === issueIdx ? null : issueIdx;
+  renderNews();
+}
+
+function toggleDesc(link) {
+  expandedDesc = expandedDesc === link ? null : link;
+  renderNews();
+}
+
+function renderNews() {
+  const key = getCacheKey();
+  const issues = issueCache[key] || [];
+  const wrap = document.getElementById('main-content');
+
+  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' :
+    selectedDate === getKSTDate(0) ? '오늘' : selectedDate === getKSTDate(1) ? '어제' : selectedDate.slice(5).replace('-','/');
+
+  let cards = '';
+  if (issues.length === 0) {
+    cards = `<div class="empty-box"><div style="font-size:44px">📭</div><div>해당 기간 이슈가 없어요<br><span style="font-size:12px;color:var(--text3)">새로고침을 눌러보세요</span></div></div>`;
+  } else {
+    cards = issues.map((issue, i) => {
+      const item = issue.mainArticle;
+      const priority = PRIORITY_KWS.some(kw => item.title.includes(kw));
+      const tagClass = getTagClass(issue.tag);
+      const safeLink = encodeURIComponent(item.link);
+      const safeTitle = item.title.replace(/'/g, "\\'");
+      const isRelExpanded = expandedIssue === i;
+      const isDescExpanded = expandedDesc === item.link;
+      const hasRelated = issue.relatedArticles && issue.relatedArticles.length > 0;
+
+      return `<div class="issue-card${priority?' priority':''}">
+        <div class="issue-header">
+          <div class="issue-meta">
+            <span class="issue-num">ISSUE ${i+1}</span>
+            ${issue.issueKw ? `<span class="issue-kw-badge">${issue.issueKw}</span>` : ''}
+            ${issue.tag ? `<span class="tag-chip ${tagClass}">${issue.tag}</span>` : ''}
+            ${priority ? `<span class="priority-tag">🔥 중요</span>` : ''}
+          </div>
+          <div class="main-article">
+            <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+            <button class="scrap-btn" onclick="scrap(decodeURIComponent('${safeLink}'),'${safeTitle}','${item.link}','${issue.tag||''}')">📌</button>
+          </div>
+          <div class="news-date">${formatDate(item.pubDate)}</div>
+          ${isDescExpanded ? `<div class="news-desc">${item.description}</div>` : ''}
+          <button class="expand-btn" onclick="toggleDesc('${item.link.replace(/'/g,"\\'")}')">
+            ${isDescExpanded ? '▲ 접기' : '▼ 본문 보기'}
+          </button>
+        </div>
+        ${hasRelated ? `
+          <div class="related-toggle" onclick="toggleRelated(${i})">
+            <span class="related-count">📎 관련 기사 ${issue.relatedArticles.length}건</span>
+            <span class="related-arrow">${isRelExpanded ? '▲' : '▼'}</span>
+          </div>
+          ${isRelExpanded ? `<div class="related-list">
+            ${issue.relatedArticles.map(rel => `
+              <div class="related-item">
+                <span class="related-dot"></span>
+                <div style="flex:1;">
+                  <a href="${rel.link}" target="_blank" class="related-title">${rel.title}</a>
+                  <div class="related-date">${formatDate(rel.pubDate)}</div>
+                </div>
+              </div>`).join('')}
+          </div>` : ''}
+        ` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  wrap.innerHTML = `
+    <div class="toolbar">
+      <span class="period-label">${periodText} · ${issues.length}개 이슈</span>
+      <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
+    </div>
+    <div class="content">${cards}</div>`;
+}
+
+function renderReview() {
+  const wrap = document.getElementById('main-content');
+  const recommended = ratings.filter(r => r.type === 'recommended');
+  const filtered = ratings.filter(r => r.type === 'filtered');
+  const unrated = ratings.filter(r => !r.rating).length;
+
+  function renderCards(items, label, emoji) {
+    if (items.length === 0) return '';
+    const cards = items.map(item => {
+      const safeId = encodeURIComponent(item.id);
+      const tagClass = getTagClass(item.tag);
+      return `<div class="review-card">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          ${item.tag ? `<span class="tag-chip ${tagClass}">${item.tag}</span>` : ''}
+          <span class="filter-reason">${emoji} ${label}${item.filterReason ? ' · ' + item.filterReason : ''}</span>
+        </div>
+        <a href="${item.link}" target="_blank" class="news-title" style="display:block;margin-bottom:4px;font-size:13px;">${item.title}</a>
+        <div class="news-date">${formatDate(item.pubDate)}</div>
+        <div class="rating-row">
+          <button class="rate-btn good ${item.rating==='good'?'selected':''}" onclick="rateArticle(decodeURIComponent('${safeId}'),'good')">👍 유용</button>
+          <button class="rate-btn bad ${item.rating==='bad'?'selected':''}" onclick="rateArticle(decodeURIComponent('${safeId}'),'bad')">👎 불필요</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="font-size:11px;font-weight:700;color:var(--text3);padding:4px 4px 6px;">${emoji} ${label} (${items.length}건)</div>${cards}`;
+  }
+
+  const allEmpty = recommended.length === 0 && filtered.length === 0;
+  const content = allEmpty
+    ? `<div class="empty-box"><div style="font-size:44px">✅</div><div>평가할 기사가 없어요</div></div>`
+    : renderCards(recommended, '추천 기사', '🗞️') + renderCards(filtered, '걸러진 기사', '🔍');
+
+  wrap.innerHTML = `
+    <div class="toolbar">
+      <span class="period-label">평가함 · 미평가 ${unrated}건</span>
+      <button class="refresh-btn" onclick="refreshNews()">🔄 새로고침</button>
+    </div>
+    <div class="content">${content}</div>`;
+}
+
+function refreshNews() {
+  const key = getCacheKey();
+  delete issueCache[key]; delete reviewCache[key]; delete alertCache[key]; delete keywordCache[key];
+  expandedIssue = null; expandedDesc = null;
+  fetchNews();
+}
+
+function renderScraps() {
+  const filtered = scrapFilter === 'all' ? scraps : scraps.filter(s => s.tag === scrapFilter);
+  const wrap = document.getElementById('main-content');
+  const tags = [...new Set(scraps.map(s => s.tag).filter(Boolean))];
+
+  const filterTabs = tags.length > 0 ? `<div style="display:flex;gap:6px;padding:10px 16px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--border);scrollbar-width:none;">
+    <button style="padding:5px 12px;border-radius:20px;border:1.5px solid ${scrapFilter==='all'?'#444':'var(--border)'};background:${scrapFilter==='all'?'#333':'transparent'};color:${scrapFilter==='all'?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;" onclick="setScrapFilter('all')">전체(${scraps.length})</button>
+    ${tags.map(tag => `<button style="padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;" onclick="setScrapFilter('${tag}')">${tag}(${scraps.filter(s=>s.tag===tag).length})</button>`).join('')}
+  </div>` : '';
+
+  let cards = '';
+  if (filtered.length === 0) {
+    cards = `<div class="empty-box"><div style="font-size:44px">📂</div><div>스크랩한 기사가 없어요</div></div>`;
+  } else {
+    cards = filtered.map(item => {
+      const tagClass = getTagClass(item.tag);
+      return `<div class="news-card">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+          <button class="scrap-btn" style="color:#ff6b6b" onclick="deleteScrap(decodeURIComponent('${encodeURIComponent(item.id)}'))">🗑️</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+          ${item.tag ? `<span class="tag-chip ${tagClass}">${item.tag}</span>` : ''}
+          <span style="font-size:11px;color:var(--text3);">${formatDate(item.scrapDate)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  wrap.innerHTML = filterTabs + `<div class="content">${cards}</div>`;
+}
+
+function setScrapFilter(f) { scrapFilter = f; renderScraps(); }
+
+function exportRatings() {
+  const data = { exportedAt: new Date().toISOString(), version: VERSION, totalRatings: ratings.length, goodCount: ratings.filter(r=>r.rating==='good').length, badCount: ratings.filter(r=>r.rating==='bad').length, ratings };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `hr-ratings-${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('📥 평가 데이터 다운로드 완료!');
+}
+
+function clearRatings() {
+  if (confirm('평가 데이터를 모두 삭제할까요?')) {
+    ratings = []; saveRatings(); updateLabels(); showToast('🗑️ 삭제됐어요'); renderSettings();
+  }
+}
+
+function renderSettings() {
+  const wrap = document.getElementById('main-content');
+  wrap.innerHTML = `<div class="content"><div class="settings-content">
+    <div class="settings-title">⚙️ 설정</div>
+    <p class="settings-desc">HR 뉴스 ${VERSION}<br>스타벅스 인사팀 맞춤 뉴스 앱</p>
+    <div class="info-box">
+      <div class="info-title">📊 평가 데이터 현황</div>
+      <div>전체: ${ratings.length}건 · 👍 ${ratings.filter(r=>r.rating==='good').length} · 👎 ${ratings.filter(r=>r.rating==='bad').length} · 미평가 ${ratings.filter(r=>!r.rating).length}</div>
+      <div style="margin-top:4px;color:var(--text3);font-size:11px;">데이터 내보내기 → Claude에게 전달 → v9 업데이트</div>
+    </div>
+    <button class="export-btn" onclick="exportRatings()">📥 평가 데이터 내보내기</button>
+    <div class="info-box">
+      <div class="info-title">🔗 이슈 클러스터링</div>
+      <div>같은 이슈 기사 자동 묶음</div>
+      <div>대표 기사 + 관련 기사 펼치기</div>
+    </div>
+    <div class="info-box">
+      <div class="info-title">🏷️ 자동 태그 분류</div>
+      <div>노동법 · 채용 · 보상 · 노사 · HR트렌드</div>
+    </div>
+    <div class="info-box">
+      <div class="info-title">📱 홈화면 추가 (iOS)</div>
+      <div>Safari → 공유 버튼 → 홈 화면에 추가</div>
+    </div>
+    <button class="danger-btn" onclick="clearRatings()">🗑️ 평가 데이터 초기화</button>
+  </div></div>`;
+}
+
+function render() {
+  renderPeriodRow(); updateLabels();
+  if (currentTab === 'news') {
+    const key = getCacheKey();
+    if (!issueCache[key]) fetchNews();
+    else { renderAlerts(alertCache[key]); renderKeywords(keywordCache[key]); renderNews(); }
+  } else if (currentTab === 'review') {
+    const key = getCacheKey();
+    if (!issueCache[key]) fetchNews();
+    else renderReview();
+  } else if (currentTab === 'scraps') {
+    renderScraps();
+  } else {
+    renderSettings();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
