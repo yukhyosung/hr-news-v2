@@ -129,7 +129,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="header-top">
       <span style="font-size:22px">📰</span>
       <span class="header-title">HR 뉴스</span>
-      <span class="version-tag">v8.0</span>
+      <span class="version-tag">v9.0</span>
       <span class="header-badge">이슈 TOP 5</span>
     </div>
     <div class="period-row" id="period-row"></div>
@@ -176,7 +176,7 @@ function getKSTDate(offset = 0) {
 }
 
 let currentTab = 'news';
-let periodMode = 'day';
+let periodMode = 'recent';
 let selectedDate = getKSTDate(0);
 let issueCache = {};
 let reviewCache = {};
@@ -215,11 +215,9 @@ function updateLabels() {
 function renderPeriodRow() {
   const today = getKSTDate(0);
   document.getElementById('period-row').innerHTML = `
-    <button class="period-btn ${periodMode==='day'&&selectedDate===today?'active':''}" onclick="setPeriod('day','today')">오늘</button>
-    <button class="period-btn ${periodMode==='day'&&selectedDate===getKSTDate(1)?'active':''}" onclick="setPeriod('day','yesterday')">어제</button>
+    <button class="period-btn ${periodMode==='recent'?'active':''}" onclick="setPeriod('recent')">최근</button>
     <button class="period-btn ${periodMode==='week'?'active':''}" onclick="setPeriod('week')">이번주</button>
     <button class="period-btn ${periodMode==='month'?'active':''}" onclick="setPeriod('month')">이번달</button>
-    <input type="date" class="date-input" value="${selectedDate}" max="${today}" onchange="setPeriod('day',this.value)"/>
   `;
 }
 
@@ -235,7 +233,7 @@ function renderAlerts(alerts) {
 function renderKeywords(keywords) {
   const area = document.getElementById('keyword-area');
   if (!keywords || keywords.length === 0) { area.innerHTML = ''; return; }
-  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' : selectedDate === getKSTDate(0) ? '오늘' : '선택일';
+  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' : '최근';
   area.innerHTML = `<div class="keyword-section">
     <div class="keyword-title">📊 ${periodText} HR 키워드 TOP</div>
     <div class="keyword-list">
@@ -244,13 +242,8 @@ function renderKeywords(keywords) {
   </div>`;
 }
 
-function setPeriod(mode, dateVal) {
+function setPeriod(mode) {
   periodMode = mode;
-  if (mode === 'day') {
-    if (dateVal === 'today') selectedDate = getKSTDate(0);
-    else if (dateVal === 'yesterday') selectedDate = getKSTDate(1);
-    else selectedDate = dateVal;
-  }
   expandedIssue = null; expandedDesc = null;
   renderPeriodRow();
   if (currentTab === 'news' || currentTab === 'review') {
@@ -260,7 +253,7 @@ function setPeriod(mode, dateVal) {
   }
 }
 
-function getCacheKey() { return `${periodMode}_${selectedDate}`; }
+function getCacheKey() { return periodMode; }
 
 function switchTab(tab) {
   currentTab = tab;
@@ -298,7 +291,7 @@ async function fetchNews() {
   wrap.innerHTML = `<div class="content"><div class="loading-box"><div class="spinner"></div>이슈 분석 중...</div></div>`;
 
   try {
-    const params = new URLSearchParams({ mode: periodMode, date: selectedDate });
+    const params = new URLSearchParams({ mode: periodMode });
     const res = await fetch(`/api/news?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -379,8 +372,7 @@ function renderNews() {
   const issues = issueCache[key] || [];
   const wrap = document.getElementById('main-content');
 
-  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' :
-    selectedDate === getKSTDate(0) ? '오늘' : selectedDate === getKSTDate(1) ? '어제' : selectedDate.slice(5).replace('-','/');
+  const periodText = periodMode === 'week' ? '이번주' : periodMode === 'month' ? '이번달' : '최근 48시간';
 
   let cards = '';
   if (issues.length === 0) {
@@ -483,8 +475,7 @@ function renderReview() {
 }
 
 function refreshNews() {
-  const key = getCacheKey();
-  delete issueCache[key]; delete reviewCache[key]; delete alertCache[key]; delete keywordCache[key];
+  delete issueCache[periodMode]; delete reviewCache[periodMode]; delete alertCache[periodMode]; delete keywordCache[periodMode];
   expandedIssue = null; expandedDesc = null;
   fetchNews();
 }
