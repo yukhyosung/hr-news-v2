@@ -113,28 +113,38 @@ export default async function handler(req, res) {
   const kstNow = getKST(now);
   const todayStr = kstNow.toISOString().split('T')[0];
 
-  const baseDateStr = date || todayStr;
-  const baseDate = new Date(baseDateStr + 'T12:00:00+09:00');
+  // 날짜 필터: 문자열 비교 대신 실제 timestamp 비교 (recent 모드 지원)
+  let startTs, endTs, periodLabel;
 
-  let startDate, endDate, periodLabel;
-  if (mode === 'week') {
-    const day = baseDate.getDay();
+  if (mode === 'recent') {
+    // 최근 48시간
+    startTs = now.getTime() - 48 * 60 * 60 * 1000;
+    endTs = now.getTime();
+    periodLabel = '최근 48시간';
+  } else if (mode === 'week') {
+    // 이번주 월요일 ~ 지금
+    const day = kstNow.getDay();
     const diff = day === 0 ? 6 : day - 1;
-    const monday = new Date(baseDate);
-    monday.setDate(baseDate.getDate() - diff);
-    startDate = monday.toISOString().split('T')[0];
-    endDate = baseDateStr;
-    periodLabel = `${startDate.slice(5).replace('-','/')} ~ ${endDate.slice(5).replace('-','/')}`;
+    const monday = new Date(kstNow);
+    monday.setDate(kstNow.getDate() - diff);
+    monday.setHours(0, 0, 0, 0);
+    startTs = monday.getTime() - 9 * 60 * 60 * 1000; // KST→UTC
+    endTs = now.getTime();
+    const startStr = monday.toISOString().split('T')[0];
+    periodLabel = `${startStr.slice(5).replace('-','/')} ~ ${todayStr.slice(5).replace('-','/')}`;
   } else if (mode === 'month') {
-    const y = baseDate.getFullYear();
-    const m = baseDate.getMonth() + 1;
-    startDate = `${y}-${String(m).padStart(2,'0')}-01`;
-    endDate = baseDateStr;
-    periodLabel = `${y}년 ${m}월`;
+    // 이번달 1일 ~ 지금
+    const y = kstNow.getFullYear();
+    const m = kstNow.getMonth();
+    const firstDay = new Date(y, m, 1, 0, 0, 0);
+    startTs = firstDay.getTime() - 9 * 60 * 60 * 1000;
+    endTs = now.getTime();
+    periodLabel = `${y}년 ${kstNow.getMonth()+1}월`;
   } else {
-    startDate = baseDateStr;
-    endDate = baseDateStr;
-    periodLabel = baseDateStr === todayStr ? '오늘' : baseDateStr.slice(5).replace('-','/');
+    // 기본값: 최근 48시간
+    startTs = now.getTime() - 48 * 60 * 60 * 1000;
+    endTs = now.getTime();
+    periodLabel = '최근 48시간';
   }
 
   function classifyTag(title, description) {
@@ -206,10 +216,8 @@ export default async function handler(req, res) {
       for (const item of items) {
         if (seenLinks.has(item.link)) continue;
         try {
-          const d = new Date(item.pubDate);
-          const kst = getKST(d);
-          const itemDate = kst.toISOString().split('T')[0];
-          if (itemDate < startDate || itemDate > endDate) continue;
+          const pubTs = new Date(item.pubDate).getTime();
+          if (pubTs < startTs || pubTs > endTs) continue;
         } catch { continue; }
         seenLinks.add(item.link);
         allItems.push({
@@ -255,7 +263,7 @@ export default async function handler(req, res) {
       let isDup = false;
       for (const seenTokens of seenTitles) {
         const overlap = tokens.filter(t => seenTokens.includes(t)).length;
-        if (overlap / Math.max(tokens.length, seenTokens.length) >= 0.5) { isDup = true; break; }
+        if (overlap / Math.max(tokens.length, seenTokens.length) >= 0.7) { isDup = true; break; }
       }
       if (isDup) { filtered.push({ ...item, filterReason: '중복' }); continue; }
       seenTitles.push(tokens);
